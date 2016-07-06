@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/fanduel/jsonrpc2-elixir.svg?token=nqWxaCNxzZYbBCynkoqE&branch=master)](https://travis-ci.com/fanduel/jsonrpc2-elixir)
+
 # JSONRPC2
 
 A JSON-RPC 2.0 request/handler implementation for Elixir. Bring your own transport.
