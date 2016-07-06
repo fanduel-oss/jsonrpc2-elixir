@@ -24,7 +24,7 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 
     ```elixir
     def deps do
-      [{:jsonrpc2, "~> 0.1.0"}, {:jiffy, "~> 0.14"}]
+      [{:jsonrpc2, git: "git@github.com:fanduel/jsonrpc2-elixir.git"}, {:jiffy, "~> 0.14"}]
     end
     ```
 
