@@ -1,15 +1,61 @@
-defmodule JSONRPC2.Handler do
+defmodule JSONRPC2.Server.Handler do
+  @moduledoc """
+  A transport-agnostic server handler for JSON-RPC 2.0.
+
+  ## Example
+
+      defmodule SpecHandler do
+        use JSONRPC2.Server.Handler
+
+        def handle_request("subtract", [x, y]) do
+          x - y
+        end
+
+        def handle_request("subtract", %{"minuend" => x, "subtrahend" => y}) do
+          x - y
+        end
+
+        def handle_request("update", _) do
+          :ok
+        end
+
+        def handle_request("sum", numbers) do
+          Enum.sum(numbers)
+        end
+
+        def handle_request("get_data", []) do
+          ["hello", 5]
+        end
+      end
+
+      SpecHandler.handle(~s({"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": 1}))
+      #=> ~s({"jsonrpc": "2.0", "result": 19, "id": 1})
+  """
+
   require Logger
 
-  @callback handle_request(JSONRPC2.method, JSONRPC2.params) :: JSONRPC2.json | no_return
+  @doc """
+  Respond to a request for `method` with `params`.
+
+  You can return any serializable result (which will be ignored for notifications), or you can throw
+  these values to produce error responses:
+
+    * `:method_not_found`, `:invalid_params`, `:internal_error`, `:server_error`
+    * any of the above, in a tuple like `{:method_not_found, %{my_error_data: 1}}` to return extra
+      data
+    * `{:jsonrpc2, code, message}` or `{:jsonrpc2, code, message, data}` to return a custom error,
+      with or without extra data.
+  """
+  @callback handle_request(method :: JSONRPC2.method, params :: JSONRPC2.params) ::
+    JSONRPC2.json | no_return
 
   defmacro __using__(_) do
-    serializer = Application.get_env(:jsonrpc2, :serializer, JSONRPC2.Serializers.JiffySerializer)
-
     quote do
       @spec handle(String.t) :: {:reply, String.t} | :noreply
       def handle(json) do
-        unquote(__MODULE__).handle(__MODULE__, unquote(serializer), json)
+        serializer = Application.get_env(:jsonrpc2, :serializer)
+
+        unquote(__MODULE__).handle(__MODULE__, serializer, json)
       end
     end
   end
@@ -89,10 +135,11 @@ defmodule JSONRPC2.Handler do
         error_response(code, message, data, id)
 
       kind, payload ->
-        Logger.error([
-          "Error in handler ", inspect(module), " for method ", method, " with params: ",
-          inspect(params), ":\n\n", Exception.format(kind, payload, System.stacktrace())
-        ])
+        _ =
+          Logger.error([
+            "Error in handler ", inspect(module), " for method ", method, " with params: ",
+            inspect(params), ":\n\n", Exception.format(kind, payload, System.stacktrace())
+          ])
 
         standard_error_response(:internal_error, id)
     end
@@ -180,10 +227,11 @@ defmodule JSONRPC2.Handler do
         {:reply, encoded_reply}
 
       {:error, reason} ->
-        Logger.info([
-          "Handler ", inspect(module), " returned invalid reply:\n  Reason: ", inspect(reason),
-          "\n  Received: ", inspect(reply), "\n  Request: ", json
-        ])
+        _ =
+          Logger.info([
+            "Handler ", inspect(module), " returned invalid reply:\n  Reason: ", inspect(reason),
+            "\n  Received: ", inspect(reply), "\n  Request: ", json
+          ])
 
         standard_error_response(:internal_error, nil)
         |> encode_response(module, serializer, json)

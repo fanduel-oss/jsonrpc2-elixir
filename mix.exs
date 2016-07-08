@@ -1,39 +1,50 @@
 defmodule JSONRPC2.Mixfile do
   use Mix.Project
 
+  @version "0.1.0"
+
   def project do
     [app: :jsonrpc2,
-     version: "0.1.0",
+     version: @version,
      elixir: "~> 1.3",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps()]
+     deps: deps(),
+     elixirc_paths: elixirc_paths(Mix.env),
+     description: description(),
+     package: package(),
+     name: "JSONRPC2",
+     docs: [source_ref: "v#{@version}", main: "README",
+            canonical: "http://hexdocs.pm/jsonrpc2",
+            source_url: "https://github.com/fanduel/jsonrpc2-elixir",
+            extras: ["README.md"]],
+     preferred_cli_env: [docs: :docs],
+     dialyzer: [plt_add_apps: [:shackle, :ranch, :jiffy]]]
   end
 
-  # Configuration for the OTP application
-  #
-  # Type "mix help compile.app" for more information
   def application do
-    applications =
-      if Mix.env in [:dev, :test] do
-        [:logger, :jiffy]
-      else
-        [:logger]
-      end
-
-    [applications: applications]
+    [applications: [:logger],
+     env: [serializer: Poison]]
   end
 
-  # Dependencies can be Hex packages:
-  #
-  #   {:mydep, "~> 0.3.0"}
-  #
-  # Or git/path repositories:
-  #
-  #   {:mydep, git: "https://github.com/elixir-lang/mydep.git", tag: "0.1.0"}
-  #
-  # Type "mix help deps" for more examples and options
   defp deps do
-    [{:jiffy, ">= 0.0.0", only: [:dev, :test]}]
+    [{:poison, "~> 2.2", optional: true},
+     {:jiffy, "~> 0.14", optional: true},
+     {:ranch, "~> 1.2", optional: true},
+     {:shackle, github: "lpgauth/shackle", tag: "0.3.1", optional: true},
+     {:ex_doc, "~> 0.12", only: :docs},
+     {:dialyxir, "~> 0.3", only: :dev}]
+  end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_),     do: ["lib"]
+
+  defp description do
+    "JSON-RPC 2.0 for Elixir."
+  end
+
+  defp package do
+    [maintainers: ["Eric Entin"],
+     licenses: ["Apache 2.0"],
+     links: %{"GitHub" => "https://github.com/fanduel/jsonrpc2-elixir"},
+     files: ~w(mix.exs README.md LICENSE lib)]
   end
 end

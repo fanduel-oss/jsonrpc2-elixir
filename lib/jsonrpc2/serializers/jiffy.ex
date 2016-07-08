@@ -1,4 +1,4 @@
-defmodule JSONRPC2.Serializers.JiffySerializer do
+defmodule JSONRPC2.Serializers.Jiffy do
   @moduledoc false
 
   def decode(json) do
