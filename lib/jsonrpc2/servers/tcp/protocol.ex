@@ -24,7 +24,7 @@ defmodule JSONRPC2.Servers.TCP.Protocol do
 
     {:ok, _} = Task.start fn ->
       case jsonrpc2_handler.handle(data) do
-        {:reply, reply} -> transport.send(socket, reply)
+        {:reply, reply} -> transport.send(socket, [reply, "\r\n"])
         :noreply -> :noreply
       end
     end
