@@ -30,7 +30,7 @@ defmodule JSONRPC2.Clients.TCP do
         host -> host
       end
 
-    client_opts = [ip: ip, port: port, socket_options: [:binary]] ++ client_opts
+    client_opts = [ip: ip, port: port, socket_options: [:binary, packet: :line]] ++ client_opts
     :shackle_pool.start(name, Protocol, client_opts, pool_opts)
   end
 
