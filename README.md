@@ -4,7 +4,7 @@
 
 JSON-RPC 2.0 for Elixir.
 
-Use the included line-based TCP server/client, or bring your own transport. HTTPoison/Plug-based HTTP(S) support coming soon.
+Use the included line-based TCP/TLS server/client, JSON-in-the-body HTTP(S) server/client, or bring your own transport.
 
 See the [`examples`](https://github.com/fanduel/jsonrpc2-elixir/tree/master/examples) directory as well as the [`JSONRPC2`](JSONRPC2.html) docs for examples.
 
@@ -54,9 +54,9 @@ end
 
 If you use your own serializer, you do not (necessarily) need to add `poison` or `jiffy` to your deps/apps.
 
-## TCP server
+## TCP/TLS server
 
-If you plan to use the TCP server, you also need to add `ranch` to your deps/apps.
+If you plan to use the TCP/TLS server, you also need to add `ranch` to your deps/apps.
 
 ```elixir
 def deps do
@@ -70,9 +70,9 @@ def application do
 end
 ```
 
-## TCP client
+## TCP/TLS client
 
-If you plan to use the TCP client, you also need to add `shackle` to your deps/apps.
+If you plan to use the TCP/TLS client, you also need to add `shackle` to your deps/apps.
 
 ```elixir
 def deps do
@@ -83,5 +83,37 @@ end
 ```elixir
 def application do
   [applications: [..., :shackle]]
+end
+```
+
+## HTTP(S) server
+
+If you plan to use the HTTP(S) server, you also need to add `plug` and `cowboy` to your deps/apps.
+
+```elixir
+def deps do
+  [..., {:plug, "~> 1.1"}, {:cowboy, "~> 1.0"}]
+end
+```
+
+```elixir
+def application do
+  [applications: [..., :plug, :cowboy]]
+end
+```
+
+## HTTP(S) client
+
+If you plan to use the HTTP(S) client, you also need to add `hackney` to your deps/apps.
+
+```elixir
+def deps do
+  [..., {:hackney, "~> 1.6"}]
+end
+```
+
+```elixir
+def application do
+  [applications: [..., :hackney]]
 end
 ```

@@ -1,4 +1,4 @@
-# Run with `mix run hello_world.exs`
+# Run with `mix run hello_world_tcp.exs`
 
 # Ensure Ranch and shackle are started (usually via mix.exs)
 Application.ensure_all_started(:ranch)

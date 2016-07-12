@@ -22,12 +22,13 @@ defmodule JSONRPC2.Servers.TCP.Protocol do
     {_ref, _socket, transport, jsonrpc2_handler, timeout} = state
     transport.setopts(socket, active: :once)
 
-    {:ok, _} = Task.start fn ->
-      case jsonrpc2_handler.handle(data) do
-        {:reply, reply} -> transport.send(socket, [reply, "\r\n"])
-        :noreply -> :noreply
+    {:ok, _} =
+      Task.start fn ->
+        case jsonrpc2_handler.handle(data) do
+          {:reply, reply} -> transport.send(socket, [reply, "\r\n"])
+          :noreply -> :noreply
+        end
       end
-    end
 
     {:noreply, state, timeout}
   end
