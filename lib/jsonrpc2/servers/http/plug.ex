@@ -14,8 +14,6 @@ defmodule JSONRPC2.Servers.HTTP.Plug do
   "/jsonrpc".
   """
 
-  import Plug.Conn
-
   @doc false
   def init(handler) do
     handler
@@ -32,8 +30,8 @@ defmodule JSONRPC2.Servers.HTTP.Plug do
       end
 
     conn
-    |> put_resp_header("content-type", "application/json")
-    |> resp(200, resp_body)
+    |> Plug.Conn.put_resp_header("content-type", "application/json")
+    |> Plug.Conn.resp(200, resp_body)
   end
 
   def call(conn, _) do

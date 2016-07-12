@@ -1,7 +1,9 @@
 defmodule JSONRPC2.Clients.TCP.Protocol do
   @moduledoc false
 
-  @behaviour :shackle_client
+  if Code.ensure_loaded?(:shackle_client) do
+    @behaviour :shackle_client
+  end
 
   require Logger
 

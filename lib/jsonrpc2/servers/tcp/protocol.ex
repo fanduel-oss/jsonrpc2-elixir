@@ -4,7 +4,9 @@ defmodule JSONRPC2.Servers.TCP.Protocol do
   use GenServer
   require Logger
 
-  @behaviour :ranch_protocol
+  if Code.ensure_loaded?(:ranch_protocol) do
+    @behaviour :ranch_protocol
+  end
 
   def start_link(ref, socket, transport, {jsonrpc2_handler, timeout}) do
     :proc_lib.start_link(__MODULE__, :init, [{ref, socket, transport, jsonrpc2_handler, timeout}])

@@ -6,7 +6,7 @@ JSON-RPC 2.0 for Elixir.
 
 Use the included line-based TCP/TLS server/client, JSON-in-the-body HTTP(S) server/client, or bring your own transport.
 
-See the [`examples`](https://github.com/fanduel/jsonrpc2-elixir/tree/master/examples) directory as well as the [`JSONRPC2`](JSONRPC2.html) docs for examples.
+See the [`examples`](https://github.com/fanduel/jsonrpc2-elixir/tree/master/examples) directory as well as the [`JSONRPC2`](https://hexdocs.pm/jsonrpc2/JSONRPC2.html) docs for examples.
 
 ## Installation
 
@@ -14,7 +14,7 @@ See the [`examples`](https://github.com/fanduel/jsonrpc2-elixir/tree/master/exam
 
 ```elixir
 def deps do
-  [{:jsonrpc2, git: "git@github.com:fanduel/jsonrpc2-elixir.git"}, {:poison, "~> 2.2"}]
+  [{:jsonrpc2, "~> 0.2"}, {:poison, "~> 2.2"}]
 end
 ```
 
@@ -42,7 +42,7 @@ If you are going to use the `jiffy` serializer, you must add it to your deps and
 
 ```elixir
 def deps do
-  [{:jsonrpc2, git: "git@github.com:fanduel/jsonrpc2-elixir.git"}, {:jiffy, "~> 0.14"}]
+  [..., {:jiffy, "~> 0.14"}]
 end
 ```
 
@@ -76,7 +76,7 @@ If you plan to use the TCP/TLS client, you also need to add `shackle` to your de
 
 ```elixir
 def deps do
-  [..., {:shackle, github: "lpgauth/shackle", tag: "0.3.1"}]
+  [..., {:shackle, "~> 0.3"}]
 end
 ```
 

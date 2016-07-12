@@ -1,7 +1,7 @@
 defmodule JSONRPC2.Mixfile do
   use Mix.Project
 
-  @version "0.2.0"
+  @version "0.2.1"
 
   def project do
     [app: :jsonrpc2,
@@ -16,7 +16,9 @@ defmodule JSONRPC2.Mixfile do
             canonical: "http://hexdocs.pm/jsonrpc2",
             source_url: "https://github.com/fanduel/jsonrpc2-elixir",
             extras: ["README.md"]],
-     dialyzer: [plt_add_apps: [:shackle, :ranch, :plug, :hackney]]]
+     dialyzer: [plt_add_apps: [:shackle, :ranch, :plug, :hackney]],
+     xref: [exclude: [Poison, :hackney, :jiffy, :ranch, :shackle, :shackle_pool, Plug.Conn,
+                      Plug.Adapters.Cowboy]]]
   end
 
   def application do
@@ -28,7 +30,7 @@ defmodule JSONRPC2.Mixfile do
     [{:poison, "~> 2.2", optional: true},
      {:jiffy, "~> 0.14", optional: true},
      {:ranch, "~> 1.2", optional: true},
-     {:shackle, github: "lpgauth/shackle", tag: "0.3.1", optional: true},
+     {:shackle, "~> 0.3", optional: true},
      {:plug, "~> 1.1", optional: true},
      {:hackney, "~> 1.6", optional: true},
      {:cowboy, "~> 1.0", only: :test},
