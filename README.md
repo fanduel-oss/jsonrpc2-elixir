@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/fanduel/jsonrpc2-elixir.svg?token=nqWxaCNxzZYbBCynkoqE&branch=master)](https://travis-ci.com/fanduel/jsonrpc2-elixir)
+[![Build Status](https://travis-ci.org/fanduel/jsonrpc2-elixir.svg?branch=master)](https://travis-ci.org/fanduel/jsonrpc2-elixir)
 
 # JSONRPC2
 
