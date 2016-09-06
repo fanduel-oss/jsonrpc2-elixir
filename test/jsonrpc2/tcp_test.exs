@@ -18,10 +18,15 @@ defmodule JSONRPC2.Clients.TCPTest do
 
   test "call" do
     assert JSONRPC2.Clients.TCP.call(__MODULE__, "subtract", [2, 1]) == {:ok, 1}
+
+    assert JSONRPC2.Clients.TCP.call(__MODULE__, "subtract", [2, 1], true) == {:ok, 1}
   end
 
   test "cast" do
     {:ok, request_id} = JSONRPC2.Clients.TCP.cast(__MODULE__, "subtract", [2, 1])
+    assert JSONRPC2.Clients.TCP.receive_response(request_id) == {:ok, 1}
+
+    {:ok, request_id} = JSONRPC2.Clients.TCP.cast(__MODULE__, "subtract", [2, 1], true)
     assert JSONRPC2.Clients.TCP.receive_response(request_id) == {:ok, 1}
   end
 

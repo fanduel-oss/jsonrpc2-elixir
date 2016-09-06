@@ -44,20 +44,27 @@ defmodule JSONRPC2.Clients.TCP do
 
   @doc """
   Call the given `method` with `params` using the client pool named `name`.
+
+  For compatibility with pathological implementations, you can optionally pass `true` for
+  the `string_id` parameter to force the request ID to be a string.
   """
-  @spec call(atom, JSONRPC2.method, JSONRPC2.params) :: {:ok, any} | {:error, any}
-  def call(name, method, params) do
-    :shackle.call(name, {:call, method, params})
+  @spec call(atom, JSONRPC2.method, JSONRPC2.params, boolean) :: {:ok, any} | {:error, any}
+  def call(name, method, params, string_id \\ false) do
+    :shackle.call(name, {:call, method, params, string_id})
   end
 
   @doc """
   Asynchronously call the given `method` with `params` using the client pool named `name`.
 
   Use `receive_response/1` with the `request_id` to get the response.
+
+  For compatibility with pathological implementations, you can optionally pass `true` for
+  the `string_id` parameter to force the request ID to be a string.
   """
-  @spec cast(atom, JSONRPC2.method, JSONRPC2.params) :: {:ok, request_id} | {:error, :backlog_full}
-  def cast(name, method, params) do
-    :shackle.cast(name, {:call, method, params})
+  @spec cast(atom, JSONRPC2.method, JSONRPC2.params, boolean) ::
+    {:ok, request_id} | {:error, :backlog_full}
+  def cast(name, method, params, string_id \\ false) do
+    :shackle.cast(name, {:call, method, params, string_id})
   end
 
   @doc """

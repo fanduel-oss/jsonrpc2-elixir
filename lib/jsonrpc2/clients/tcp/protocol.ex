@@ -16,14 +16,22 @@ defmodule JSONRPC2.Clients.TCP.Protocol do
     {:ok, state}
   end
 
-  def handle_request({:call, method, params}, state) do
-    external_request_id = external_request_id(state.request_counter)
+  def handle_request({:call, method, params, string_id}, state) do
+    external_request_id_int = external_request_id(state.request_counter)
+
+    external_request_id =
+      if string_id do
+        Integer.to_string(external_request_id_int)
+      else
+        external_request_id_int
+      end
 
     {:ok, data} =
       {method, params, external_request_id}
       |> JSONRPC2.Request.serialized_request(state.serializer)
 
-    {:ok, external_request_id, [data, "\r\n"], %{state | request_counter: external_request_id + 1}}
+    new_state = %{state | request_counter: external_request_id_int + 1}
+    {:ok, external_request_id, [data, "\r\n"], new_state}
   end
 
   def handle_request({:notify, method, params}, state) do
