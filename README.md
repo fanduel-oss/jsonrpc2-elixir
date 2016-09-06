@@ -14,7 +14,7 @@ See the [`examples`](https://github.com/fanduel/jsonrpc2-elixir/tree/master/exam
 
 ```elixir
 def deps do
-  [{:jsonrpc2, "~> 0.3"}, {:poison, "~> 2.2"}]
+  [{:jsonrpc2, "~> 0.4"}, {:poison, "~> 2.2"}]
 end
 ```
 

@@ -5,9 +5,19 @@ defmodule JSONRPC2.Clients.TCP do
 
   alias JSONRPC2.Clients.TCP.Protocol
 
+  @default_timeout 5_000
+
   @type host :: binary | :inet.socket_address | :inet.hostname
 
   @type request_id :: any
+
+  @type call_option ::
+    {:string_id, boolean} |
+    {:timeout, pos_integer}
+
+  @type call_options :: [call_option]
+
+  @type cast_options :: [{:string_id, boolean}]
 
   @doc """
   Start a client pool named `name`, connected to `host` at `port`.
@@ -43,36 +53,62 @@ defmodule JSONRPC2.Clients.TCP do
   end
 
   @doc """
-  Call the given `method` with `params` using the client pool named `name`.
+  Call the given `method` with `params` using the client pool named `name` with `options`.
 
-  For compatibility with pathological implementations, you can optionally pass `true` for
-  the `string_id` parameter to force the request ID to be a string.
+  You can provide the option `string_id: true` for compatibility with pathological implementations,
+  to force the request ID to be a string.
+
+  You can also provide the option `timeout: 5_000` to set the timeout to 5000ms, for instance.
+
+  For backwards compatibility reasons, you may also provide a boolean for the `options` parameter,
+  which will set `string_id` to the given boolean.
   """
-  @spec call(atom, JSONRPC2.method, JSONRPC2.params, boolean) :: {:ok, any} | {:error, any}
-  def call(name, method, params, string_id \\ false) do
-    :shackle.call(name, {:call, method, params, string_id})
+  @spec call(atom, JSONRPC2.method, JSONRPC2.params, boolean | call_options) :: {:ok, any} | {:error, any}
+  def call(name, method, params, options \\ [])
+
+
+  def call(name, method, params, string_id) when is_boolean(string_id) do
+    call(name, method, params, string_id: string_id)
+  end
+
+  def call(name, method, params, options) do
+    string_id = Keyword.get(options, :string_id, false)
+    timeout = Keyword.get(options, :timeout, @default_timeout)
+
+    :shackle.call(name, {:call, method, params, string_id}, timeout)
   end
 
   @doc """
-  Asynchronously call the given `method` with `params` using the client pool named `name`.
+  Asynchronously call the given `method` with `params` using the client pool named `name` with
+  `options`.
 
   Use `receive_response/1` with the `request_id` to get the response.
 
-  For compatibility with pathological implementations, you can optionally pass `true` for
-  the `string_id` parameter to force the request ID to be a string.
+  You can provide the option `string_id: true` for compatibility with pathological implementations,
+  to force the request ID to be a string.
+
+  For backwards compatibility reasons, you may also provide a boolean for the `options` parameter,
+  which will set `string_id` to the given boolean.
   """
-  @spec cast(atom, JSONRPC2.method, JSONRPC2.params, boolean) ::
+  @spec cast(atom, JSONRPC2.method, JSONRPC2.params, boolean | cast_options) ::
     {:ok, request_id} | {:error, :backlog_full}
-  def cast(name, method, params, string_id \\ false) do
+  def cast(name, method, params, options \\ [])
+
+  def cast(name, method, params, string_id) when is_boolean(string_id) do
+    cast(name, method, params, string_id: string_id)
+  end
+
+  def cast(name, method, params, options) do
+    string_id = Keyword.get(options, :string_id, false)
     :shackle.cast(name, {:call, method, params, string_id})
   end
 
   @doc """
-  Receive the response for a previous `cast/3` which returned a `request_id`.
+  Receive the response for a previous `cast/3` which returned a `request_id`, with `timeout`.
   """
-  @spec receive_response(request_id) :: {:ok, any} | {:error, any}
-  def receive_response(request_id) do
-    :shackle.receive_response(request_id)
+  @spec receive_response(request_id, pos_integer) :: {:ok, any} | {:error, any}
+  def receive_response(request_id, timeout \\ @default_timeout) do
+    :shackle.receive_response(request_id, timeout)
   end
 
   @doc """
