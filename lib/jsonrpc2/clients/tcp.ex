@@ -87,6 +87,11 @@ defmodule JSONRPC2.Clients.TCP do
   You can provide the option `string_id: true` for compatibility with pathological implementations,
   to force the request ID to be a string.
 
+  You can also provide the option `timeout: 5_000` to set the timeout to 5000ms, for instance.
+
+  Additionally, you may provide the option `pid: self()` in order to specify which process should
+  be sent the message which is returned by `receive_response/1`.
+
   For backwards compatibility reasons, you may also provide a boolean for the `options` parameter,
   which will set `string_id` to the given boolean.
   """
@@ -100,15 +105,18 @@ defmodule JSONRPC2.Clients.TCP do
 
   def cast(name, method, params, options) do
     string_id = Keyword.get(options, :string_id, false)
-    :shackle.cast(name, {:call, method, params, string_id})
+    timeout = Keyword.get(options, :timeout, @default_timeout)
+    pid = Keyword.get(options, :pid, self())
+
+    :shackle.cast(name, {:call, method, params, string_id}, pid, timeout)
   end
 
   @doc """
-  Receive the response for a previous `cast/3` which returned a `request_id`, with `timeout`.
+  Receive the response for a previous `cast/3` which returned a `request_id`.
   """
-  @spec receive_response(request_id, pos_integer) :: {:ok, any} | {:error, any}
-  def receive_response(request_id, timeout \\ @default_timeout) do
-    :shackle.receive_response(request_id, timeout)
+  @spec receive_response(request_id) :: {:ok, any} | {:error, any}
+  def receive_response(request_id) do
+    :shackle.receive_response(request_id)
   end
 
   @doc """
@@ -119,6 +127,6 @@ defmodule JSONRPC2.Clients.TCP do
   @spec notify(atom, JSONRPC2.method, JSONRPC2.params) ::
     {:ok, request_id} | {:error, :backlog_full}
   def notify(name, method, params) do
-    :shackle.cast(name, {:notify, method, params})
+    :shackle.cast(name, {:notify, method, params}, nil, 0)
   end
 end

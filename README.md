@@ -14,7 +14,7 @@ See the [`examples`](https://github.com/fanduel/jsonrpc2-elixir/tree/master/exam
 
 ```elixir
 def deps do
-  [{:jsonrpc2, "~> 0.4"}, {:poison, "~> 2.2"}]
+  [{:jsonrpc2, "~> 1.0"}, {:poison, "~> 3.1"}]
 end
 ```
 
@@ -60,7 +60,7 @@ If you plan to use the TCP/TLS server, you also need to add `ranch` to your deps
 
 ```elixir
 def deps do
-  [..., {:ranch, "~> 1.2"}]
+  [..., {:ranch, "~> 1.3"}]
 end
 ```
 
@@ -76,7 +76,7 @@ If you plan to use the TCP/TLS client, you also need to add `shackle` to your de
 
 ```elixir
 def deps do
-  [..., {:shackle, "~> 0.3"}]
+  [..., {:shackle, "~> 0.5"}]
 end
 ```
 
@@ -92,7 +92,7 @@ If you plan to use the HTTP(S) server, you also need to add `plug` and `cowboy` 
 
 ```elixir
 def deps do
-  [..., {:plug, "~> 1.1"}, {:cowboy, "~> 1.0"}]
+  [..., {:plug, "~> 1.3"}, {:cowboy, "~> 1.1"}]
 end
 ```
 
@@ -108,7 +108,7 @@ If you plan to use the HTTP(S) client, you also need to add `hackney` to your de
 
 ```elixir
 def deps do
-  [..., {:hackney, "~> 1.6"}]
+  [..., {:hackney, "~> 1.7"}]
 end
 ```
 
