@@ -21,8 +21,16 @@ defmodule JSONRPC2.Response do
   Returns a tuple containing the information contained in `response`.
   """
   @spec id_and_response(map) :: {:ok, id_and_response} | {:error, any}
-  def id_and_response(%{"jsonrpc" => "2.0", "id" => id, "result" => result}) do
+  def id_and_response(%{"jsonrpc" => "2.0", "id" => id, "result" => result}) when is_integer(id) do
     {:ok, {id, {:ok, result}}}
+  end
+
+  def id_and_response(%{"jsonrpc" => "2.0", "id" => id, "result" => result} = response) when is_binary(id) do
+    try do
+      {:ok, {String.to_integer(id), {:ok, result}}}
+    rescue
+      e in ArgumentError -> {:error, {:invalid_response, response}}
+    end
   end
 
   def id_and_response(%{"jsonrpc" => "2.0", "id" => id, "error" => error}) do
