@@ -1,7 +1,7 @@
 defmodule JSONRPC2.Mixfile do
   use Mix.Project
 
-  @version "1.0.1"
+  @version "1.0.2"
 
   def project do
     [app: :jsonrpc2,
@@ -33,7 +33,7 @@ defmodule JSONRPC2.Mixfile do
      {:shackle, "~> 0.3", optional: true},
      {:plug, "~> 1.1", optional: true},
      {:hackney, "~> 1.6", optional: true},
-     {:cowboy, "~> 1.0", only: :test},
+     {:cowboy, "~> 1.1", only: :test},
      {:ex_doc, "~> 0.12", only: :dev},
      {:dialyxir, "~> 0.3", only: :dev}]
   end

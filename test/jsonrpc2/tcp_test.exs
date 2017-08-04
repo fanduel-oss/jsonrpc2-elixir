@@ -2,7 +2,7 @@ defmodule JSONRPC2.TCPTest do
   use ExUnit.Case, async: true
 
   setup do
-    port = :crypto.rand_uniform(1000, 65535)
+    port = :rand.uniform(65535 - 1000) + 1000
 
     {:ok, pid} = JSONRPC2.Servers.TCP.start_listener(JSONRPC2.SpecHandler, port, name: __MODULE__)
 
