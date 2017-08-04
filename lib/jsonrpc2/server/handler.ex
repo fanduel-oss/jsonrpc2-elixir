@@ -74,6 +74,9 @@ defmodule JSONRPC2.Server.Handler do
 
       {:error, _error} ->
         standard_error_response(:parse_error, nil)
+
+      {:error, :invalid, _number} ->
+        standard_error_response(:parse_error, nil)
     end
     |> encode_response(module, serializer, json)
   end
