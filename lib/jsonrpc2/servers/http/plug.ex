@@ -36,5 +36,6 @@ defmodule JSONRPC2.Servers.HTTP.Plug do
 
   def call(conn, _) do
     conn
+    |> Plug.Conn.resp(404, "")
   end
 end
