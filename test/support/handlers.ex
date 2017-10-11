@@ -22,6 +22,20 @@ defmodule JSONRPC2.SpecHandler do
   end
 end
 
+defmodule JSONRPC2.LSPHandler do
+  use JSONRPC2.Server.Handler
+  alias JSONRPC2.Serializers.LSP
+
+  def handle_request("encode", [message]) do
+    LSP.encode(message)
+  end
+
+  def handle_request("decode", [packet]) do
+    LSP.decode(packet)
+  end
+
+end
+
 defmodule JSONRPC2.ErrorHandler do
   use JSONRPC2.Server.Handler
 
