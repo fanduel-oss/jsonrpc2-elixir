@@ -122,8 +122,12 @@ defmodule JSONRPC2.Server.Handler do
     try do
       result_response(module.handle_request(method, params), id)
     rescue
-      FunctionClauseError ->
-        standard_error_response(:method_not_found, id)
+      error in FunctionClauseError  ->
+        if error.module == module and error.function == :handle_request do
+          standard_error_response(:method_not_found, id)
+        else
+          raise error
+        end
     catch
       :throw, error when error in @throwable_errors ->
         standard_error_response(error, id)
