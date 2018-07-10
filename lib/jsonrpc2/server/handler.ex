@@ -122,8 +122,15 @@ defmodule JSONRPC2.Server.Handler do
     try do
       result_response(module.handle_request(method, params), id)
     rescue
-      FunctionClauseError ->
-        standard_error_response(:method_not_found, id)
+      e in FunctionClauseError ->
+        # if that error originates from the very module.handle_request call - handle, otherwise - reraise
+        case e do
+          %FunctionClauseError{function: :handle_request, module: ^module} ->
+            standard_error_response(:method_not_found, %{method: method, params: params}, id)
+          other_e ->
+            log_error(module, method, params, :error, other_e)
+            raise other_e
+        end
     catch
       :throw, error when error in @throwable_errors ->
         standard_error_response(error, id)
@@ -138,11 +145,7 @@ defmodule JSONRPC2.Server.Handler do
         error_response(code, message, data, id)
 
       kind, payload ->
-        _ =
-          Logger.error([
-            "Error in handler ", inspect(module), " for method ", method, " with params: ",
-            inspect(params), ":\n\n", Exception.format(kind, payload, System.stacktrace())
-          ])
+        log_error(module, method, params, kind, payload)
 
         standard_error_response(:internal_error, id)
     end
@@ -150,6 +153,14 @@ defmodule JSONRPC2.Server.Handler do
 
   defp dispatch(_module, _rpc) do
     standard_error_response(:invalid_request, nil)
+  end
+
+  defp log_error(module, method, params, kind, payload) do
+    _ =
+      Logger.error([
+        "Error in handler ", inspect(module), " for method ", method, " with params: ",
+        inspect(params), ":\n\n", Exception.format(kind, payload, System.stacktrace())
+      ])
   end
 
   defp result_response(_result, :undefined) do
