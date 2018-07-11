@@ -61,16 +61,10 @@ defmodule JSONRPC2.Server.Handler do
   end
 
   @doc false
-  def handle(module, serializer, json) do
+  def handle(module, serializer, json) when is_binary(json) do
     case serializer.decode(json) do
       {:ok, decoded_request} ->
-        case parse(decoded_request) do
-          batch_rpc when is_list(batch_rpc) and length(batch_rpc) > 0 ->
-            merge_responses(Enum.map(batch_rpc, &dispatch(module, &1)))
-
-          rpc ->
-            dispatch(module, rpc)
-        end
+        parse(decoded_request) |> collate_for_dispatch(module)
 
       {:error, _error} ->
         standard_error_response(:parse_error, nil)
@@ -79,6 +73,20 @@ defmodule JSONRPC2.Server.Handler do
         standard_error_response(:parse_error, nil)
     end
     |> encode_response(module, serializer, json)
+  end
+
+  def handle(module, serializer, json) do
+    parse(json)
+    |> collate_for_dispatch(module)
+    |> encode_response(module, serializer, json)
+  end
+
+  defp collate_for_dispatch(batch_rpc, module) when is_list(batch_rpc) and length(batch_rpc) > 0 do
+    merge_responses(Enum.map(batch_rpc, &dispatch(module, &1)))
+  end
+
+  defp collate_for_dispatch(rpc, module) do
+    dispatch(module, rpc)
   end
 
   defp parse(requests) when is_list(requests) do
