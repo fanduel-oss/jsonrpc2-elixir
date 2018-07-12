@@ -128,8 +128,9 @@ defmodule JSONRPC2.Server.Handler do
           %FunctionClauseError{function: :handle_request, module: ^module} ->
             standard_error_response(:method_not_found, %{method: method, params: params}, id)
           other_e ->
+            original_stacktrace = System.stacktrace()
             log_error(module, method, params, :error, other_e)
-            raise other_e
+            Kernel.reraise(other_e, original_stacktrace)
         end
     catch
       :throw, error when error in @throwable_errors ->

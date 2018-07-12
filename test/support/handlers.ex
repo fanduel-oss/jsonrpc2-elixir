@@ -57,3 +57,11 @@ defmodule JSONRPC2.ErrorHandler do
     throw {:jsonrpc2, 404, "Custom not found error", other}
   end
 end
+
+defmodule JSONRPC2.BuggyHandler do
+  use JSONRPC2.Server.Handler
+
+  def handle_request("raise_function_clause_error", []) do
+    String.contains?(5, 5)
+  end
+end
