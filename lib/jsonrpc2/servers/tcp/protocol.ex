@@ -25,12 +25,12 @@ defmodule JSONRPC2.Servers.TCP.Protocol do
     transport.setopts(socket, active: :once)
 
     {:ok, _} =
-      Task.start fn ->
+      Task.start(fn ->
         case jsonrpc2_handler.handle(data) do
           {:reply, reply} -> transport.send(socket, [reply, "\r\n"])
           :noreply -> :noreply
         end
-      end
+      end)
 
     {:noreply, state, timeout}
   end
@@ -47,7 +47,10 @@ defmodule JSONRPC2.Servers.TCP.Protocol do
   def handle_info(message, state) do
     _ =
       Logger.info([
-        inspect(__MODULE__), " with state:\n", inspect(state), "\nreceived unexpected message:\n",
+        inspect(__MODULE__),
+        " with state:\n",
+        inspect(state),
+        "\nreceived unexpected message:\n",
         inspect(message)
       ])
 

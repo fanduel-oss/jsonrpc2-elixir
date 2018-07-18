@@ -5,13 +5,14 @@ defmodule JSONRPC2.HTTPTest do
     port = :rand.uniform(65535 - 1000) + 1000
     {:ok, pid} = JSONRPC2.Servers.HTTP.http(JSONRPC2.SpecHandler, port: port)
 
-    on_exit fn ->
+    on_exit(fn ->
       ref = Process.monitor(pid)
       JSONRPC2.Servers.HTTP.shutdown(JSONRPC2.SpecHandler.HTTP)
+
       receive do
-          {:DOWN, ^ref, :process, ^pid, :shutdown} -> :ok
+        {:DOWN, ^ref, :process, ^pid, :shutdown} -> :ok
       end
-    end
+    end)
 
     {:ok, %{port: port}}
   end

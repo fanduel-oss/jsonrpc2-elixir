@@ -7,13 +7,13 @@ defmodule JSONRPC2.Clients.TCP do
 
   @default_timeout 5_000
 
-  @type host :: binary | :inet.socket_address | :inet.hostname
+  @type host :: binary | :inet.socket_address() | :inet.hostname()
 
   @type request_id :: any
 
   @type call_option ::
-    {:string_id, boolean} |
-    {:timeout, pos_integer}
+          {:string_id, boolean}
+          | {:timeout, pos_integer}
 
   @type call_options :: [call_option]
 
@@ -26,7 +26,7 @@ defmodule JSONRPC2.Clients.TCP do
   [here](https://github.com/lpgauth/shackle#client_options), as well as `pool_opts`, detailed
   [here](https://github.com/lpgauth/shackle#pool_options).
   """
-  @spec start(host, :inet.port_number, atom, Keyword.t, Keyword.t) :: :ok
+  @spec start(host, :inet.port_number(), atom, Keyword.t(), Keyword.t()) :: :ok
   def start(host, port, name, client_opts \\ [], pool_opts \\ []) do
     host = if is_binary(host), do: to_charlist(host), else: host
 
@@ -37,7 +37,9 @@ defmodule JSONRPC2.Clients.TCP do
             {:ok, ip} -> ip
             {:error, :einval} -> host
           end
-        host -> host
+
+        host ->
+          host
       end
 
     client_opts = Keyword.merge([ip: ip, port: port, socket_options: [:binary, packet: :line]], client_opts)
@@ -63,9 +65,9 @@ defmodule JSONRPC2.Clients.TCP do
   For backwards compatibility reasons, you may also provide a boolean for the `options` parameter,
   which will set `string_id` to the given boolean.
   """
-  @spec call(atom, JSONRPC2.method, JSONRPC2.params, boolean | call_options) :: {:ok, any} | {:error, any}
+  @spec call(atom, JSONRPC2.method(), JSONRPC2.params(), boolean | call_options) ::
+          {:ok, any} | {:error, any}
   def call(name, method, params, options \\ [])
-
 
   def call(name, method, params, string_id) when is_boolean(string_id) do
     call(name, method, params, string_id: string_id)
@@ -95,8 +97,8 @@ defmodule JSONRPC2.Clients.TCP do
   For backwards compatibility reasons, you may also provide a boolean for the `options` parameter,
   which will set `string_id` to the given boolean.
   """
-  @spec cast(atom, JSONRPC2.method, JSONRPC2.params, boolean | cast_options) ::
-    {:ok, request_id} | {:error, :backlog_full}
+  @spec cast(atom, JSONRPC2.method(), JSONRPC2.params(), boolean | cast_options) ::
+          {:ok, request_id} | {:error, :backlog_full}
   def cast(name, method, params, options \\ [])
 
   def cast(name, method, params, string_id) when is_boolean(string_id) do
@@ -124,8 +126,7 @@ defmodule JSONRPC2.Clients.TCP do
 
   This function returns a `request_id`, but it should not be used with `receive_response/1`.
   """
-  @spec notify(atom, JSONRPC2.method, JSONRPC2.params) ::
-    {:ok, request_id} | {:error, :backlog_full}
+  @spec notify(atom, JSONRPC2.method(), JSONRPC2.params()) :: {:ok, request_id} | {:error, :backlog_full}
   def notify(name, method, params) do
     :shackle.cast(name, {:notify, method, params}, nil, 0)
   end

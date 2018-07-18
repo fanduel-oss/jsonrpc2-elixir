@@ -45,7 +45,9 @@ defmodule JSONRPC2.Clients.TCP.Protocol do
       {:ok, {nil, result}} ->
         _ =
           Logger.error([
-            inspect(__MODULE__), " received response with null ID: ", inspect(result)
+            inspect(__MODULE__),
+            " received response with null ID: ",
+            inspect(result)
           ])
 
         {:ok, [], state}
@@ -56,7 +58,9 @@ defmodule JSONRPC2.Clients.TCP.Protocol do
       {:error, error} ->
         _ =
           Logger.error([
-            inspect(__MODULE__), " received invalid response, error: ", inspect(error)
+            inspect(__MODULE__),
+            " received invalid response, error: ",
+            inspect(error)
           ])
 
         {:ok, [], state}
@@ -68,6 +72,6 @@ defmodule JSONRPC2.Clients.TCP.Protocol do
   end
 
   defp external_request_id(request_counter) do
-    rem(request_counter, 2147483647)
+    rem(request_counter, 2_147_483_647)
   end
 end

@@ -46,12 +46,12 @@ defmodule JSONRPC2.Server.Handler do
     * `{:jsonrpc2, code, message}` or `{:jsonrpc2, code, message, data}` to return a custom error,
       with or without extra data.
   """
-  @callback handle_request(method :: JSONRPC2.method, params :: JSONRPC2.params) ::
-    JSONRPC2.json | no_return
+  @callback handle_request(method :: JSONRPC2.method(), params :: JSONRPC2.params()) ::
+              JSONRPC2.json() | no_return
 
   defmacro __using__(_) do
     quote do
-      @spec handle(String.t) :: {:reply, String.t} | :noreply
+      @spec handle(String.t()) :: {:reply, String.t()} | :noreply
       def handle(json) do
         serializer = Application.get_env(:jsonrpc2, :serializer)
 
@@ -111,10 +111,8 @@ defmodule JSONRPC2.Server.Handler do
   end
 
   defp valid_request?(version, method, params, id) do
-    version == "2.0" and
-    is_binary(method) and
-    (is_list(params) or is_map(params)) and
-    (id in [:undefined, :nil] or is_binary(id) or is_number(id))
+    version == "2.0" and is_binary(method) and (is_list(params) or is_map(params)) and
+      (id in [:undefined, nil] or is_binary(id) or is_number(id))
   end
 
   defp merge_responses(responses) do
@@ -135,6 +133,7 @@ defmodule JSONRPC2.Server.Handler do
         case e do
           %FunctionClauseError{function: :handle_request, module: ^module} ->
             standard_error_response(:method_not_found, %{method: method, params: params}, id)
+
           other_e ->
             original_stacktrace = System.stacktrace()
             log_error(module, method, params, :error, other_e)
@@ -167,8 +166,14 @@ defmodule JSONRPC2.Server.Handler do
   defp log_error(module, method, params, kind, payload) do
     _ =
       Logger.error([
-        "Error in handler ", inspect(module), " for method ", method, " with params: ",
-        inspect(params), ":\n\n", Exception.format(kind, payload, System.stacktrace())
+        "Error in handler ",
+        inspect(module),
+        " for method ",
+        method,
+        " with params: ",
+        inspect(params),
+        ":\n\n",
+        Exception.format(kind, payload, System.stacktrace())
       ])
   end
 
@@ -177,11 +182,12 @@ defmodule JSONRPC2.Server.Handler do
   end
 
   defp result_response(result, id) do
-    {:reply, %{
-      "jsonrpc" => "2.0",
-      "result" => result,
-      "id" => id
-    }}
+    {:reply,
+     %{
+       "jsonrpc" => "2.0",
+       "result" => result,
+       "id" => id
+     }}
   end
 
   defp standard_error_response(error_type, id) do
@@ -252,8 +258,14 @@ defmodule JSONRPC2.Server.Handler do
       {:error, reason} ->
         _ =
           Logger.info([
-            "Handler ", inspect(module), " returned invalid reply:\n  Reason: ", inspect(reason),
-            "\n  Received: ", inspect(reply), "\n  Request: ", json
+            "Handler ",
+            inspect(module),
+            " returned invalid reply:\n  Reason: ",
+            inspect(reason),
+            "\n  Received: ",
+            inspect(reply),
+            "\n  Request: ",
+            json
           ])
 
         standard_error_response(:internal_error, nil)

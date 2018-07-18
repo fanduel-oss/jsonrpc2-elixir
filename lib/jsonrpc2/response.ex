@@ -4,12 +4,12 @@ defmodule JSONRPC2.Response do
   """
 
   @type id_and_response ::
-    {JSONRPC2.id | nil, {:ok, any} | {:error, code :: integer, message :: String.t, data :: any}}
+          {JSONRPC2.id() | nil, {:ok, any} | {:error, code :: integer, message :: String.t(), data :: any}}
 
   @doc """
   Deserialize the given `response` using `serializer`.
   """
-  @spec deserialize_response(String.t, module) :: {:ok, id_and_response} | {:error, any}
+  @spec deserialize_response(String.t(), module) :: {:ok, id_and_response} | {:error, any}
   def deserialize_response(response, serializer) do
     case serializer.decode(response) do
       {:ok, response} -> id_and_response(response)

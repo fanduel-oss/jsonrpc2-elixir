@@ -141,22 +141,22 @@ defmodule JSONRPC2 do
   """
 
   @typedoc "A JSON-RPC 2.0 method."
-  @type method :: String.t
+  @type method :: String.t()
 
   @typedoc "A decoded JSON object."
   @type json ::
-    nil |
-    true |
-    false |
-    float |
-    integer |
-    String.t |
-    [json] |
-    %{optional(String.t) => json}
+          nil
+          | true
+          | false
+          | float
+          | integer
+          | String.t()
+          | [json]
+          | %{optional(String.t()) => json}
 
   @typedoc "A JSON-RPC 2.0 params value."
-  @type params :: [json] | %{optional(String.t) => json}
+  @type params :: [json] | %{optional(String.t()) => json}
 
   @typedoc "A JSON-RPC 2.0 request ID."
-  @type id :: String.t | number
+  @type id :: String.t() | number
 end

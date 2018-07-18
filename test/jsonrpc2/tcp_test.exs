@@ -8,14 +8,15 @@ defmodule JSONRPC2.TCPTest do
 
     :ok = JSONRPC2.Clients.TCP.start("localhost", port, __MODULE__)
 
-    on_exit fn ->
+    on_exit(fn ->
       ref = Process.monitor(pid)
       JSONRPC2.Clients.TCP.stop(__MODULE__)
       JSONRPC2.Servers.TCP.stop(__MODULE__)
+
       receive do
         {:DOWN, ^ref, :process, ^pid, :shutdown} -> :ok
       end
-    end
+    end)
   end
 
   test "call" do
@@ -35,7 +36,9 @@ defmodule JSONRPC2.TCPTest do
     {:ok, request_id} = JSONRPC2.Clients.TCP.cast(__MODULE__, "subtract", [2, 1], true)
     assert JSONRPC2.Clients.TCP.receive_response(request_id) == {:ok, 1}
 
-    {:ok, request_id} = JSONRPC2.Clients.TCP.cast(__MODULE__, "subtract", [2, 1], string_id: true, timeout: 2_000)
+    {:ok, request_id} =
+      JSONRPC2.Clients.TCP.cast(__MODULE__, "subtract", [2, 1], string_id: true, timeout: 2_000)
+
     assert JSONRPC2.Clients.TCP.receive_response(request_id) == {:ok, 1}
   end
 

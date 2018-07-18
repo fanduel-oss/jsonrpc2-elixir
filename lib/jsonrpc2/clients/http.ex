@@ -3,7 +3,7 @@ defmodule JSONRPC2.Clients.HTTP do
   A client for JSON-RPC 2.0 using an HTTP transport with JSON in the body.
   """
 
-  @type batch_result :: {:ok, JSONRPC2.Response.id_and_response} | {:error, any}
+  @type batch_result :: {:ok, JSONRPC2.Response.id_and_response()} | {:error, any}
 
   @doc """
   Make a call to `url` for JSON-RPC 2.0 `method` with `params`.
@@ -13,8 +13,8 @@ defmodule JSONRPC2.Clients.HTTP do
 
   See [hackney](https://github.com/benoitc/hackney) for more information on the available options.
   """
-  @spec call(String.t, JSONRPC2.method, JSONRPC2.params, any, atom, list) ::
-    {:ok, any} | {:error, any}
+  @spec call(String.t(), JSONRPC2.method(), JSONRPC2.params(), any, atom, list) ::
+          {:ok, any} | {:error, any}
   def call(url, method, params, headers \\ [], http_method \\ :post, hackney_opts \\ []) do
     serializer = Application.get_env(:jsonrpc2, :serializer)
     {:ok, payload} = JSONRPC2.Request.serialized_request({method, params, 0}, serializer)
@@ -46,8 +46,7 @@ defmodule JSONRPC2.Clients.HTTP do
 
   See [hackney](https://github.com/benoitc/hackney) for more information on the available options.
   """
-  @spec notify(String.t, JSONRPC2.method, JSONRPC2.params, any, atom, list) ::
-    :ok | {:error, any}
+  @spec notify(String.t(), JSONRPC2.method(), JSONRPC2.params(), any, atom, list) :: :ok | {:error, any}
   def notify(url, method, params, headers \\ [], http_method \\ :post, hackney_opts \\ []) do
     serializer = Application.get_env(:jsonrpc2, :serializer)
     {:ok, payload} = JSONRPC2.Request.serialized_request({method, params}, serializer)
@@ -67,10 +66,11 @@ defmodule JSONRPC2.Clients.HTTP do
 
   See [hackney](https://github.com/benoitc/hackney) for more information on the available options.
   """
-  @spec batch(String.t, [JSONRPC2.Request.request], any, atom, list) ::
-    [batch_result] | :ok | {:error, any}
+  @spec batch(String.t(), [JSONRPC2.Request.request()], any, atom, list) ::
+          [batch_result] | :ok | {:error, any}
   def batch(url, requests, headers \\ [], http_method \\ :post, hackney_opts \\ []) do
     serializer = Application.get_env(:jsonrpc2, :serializer)
+
     {:ok, payload} =
       Enum.map(requests, &JSONRPC2.Request.request/1)
       |> serializer.encode()

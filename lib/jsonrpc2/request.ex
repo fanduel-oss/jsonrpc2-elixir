@@ -4,8 +4,8 @@ defmodule JSONRPC2.Request do
   """
 
   @type request ::
-    {JSONRPC2.method, JSONRPC2.params} |
-    {JSONRPC2.method, JSONRPC2.params, JSONRPC2.id}
+          {JSONRPC2.method(), JSONRPC2.params()}
+          | {JSONRPC2.method(), JSONRPC2.params(), JSONRPC2.id()}
 
   @doc """
   Returns a serialized `request` using `serializer`.
@@ -24,7 +24,7 @@ defmodule JSONRPC2.Request do
   def request(request)
 
   def request({method, params})
-  when is_binary(method) and (is_list(params) or is_map(params)) do
+      when is_binary(method) and (is_list(params) or is_map(params)) do
     %{
       "jsonrpc" => "2.0",
       "method" => method,
@@ -33,7 +33,7 @@ defmodule JSONRPC2.Request do
   end
 
   def request({method, params, id})
-  when (is_number(id) or is_binary(id)) do
+      when is_number(id) or is_binary(id) do
     {method, params}
     |> request()
     |> Map.put("id", id)

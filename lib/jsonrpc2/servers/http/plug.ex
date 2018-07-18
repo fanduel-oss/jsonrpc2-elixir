@@ -21,14 +21,15 @@ defmodule JSONRPC2.Servers.HTTP.Plug do
 
   @doc false
   def call(%{method: "POST"} = conn, handler) do
+    req_body =
+      cond do
+        Plug.Conn.get_req_header(conn, "content-type")
+        |> Enum.member?("application/json") && conn.params != %{} && conn.params != %Plug.Conn.Unfetched{} ->
+          conn.params
 
-    req_body = cond do
-      Plug.Conn.get_req_header(conn, "content-type")
-        |> Enum.member?("application/json")
-         && conn.params != %{}
-         && conn.params != %Plug.Conn.Unfetched{} -> conn.params
-      true -> get_plain_body(conn)
-    end
+        true ->
+          get_plain_body(conn)
+      end
 
     resp_body =
       case handler.handle(req_body) do
