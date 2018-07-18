@@ -36,7 +36,7 @@ defmodule JSONRPC2.HandlerTest do
     test "rpc call of non-existent method" do
       assert_rpc_reply(JSONRPC2.SpecHandler,
         ~s({"jsonrpc": "2.0", "method": "foobar", "id": "1"}),
-        ~s({"jsonrpc": "2.0", "error": {"code": -32601, "message": "Method not found"}, "id": "1"})
+        ~s({"jsonrpc": "2.0", "error": {"code": -32601, "message": "Method not found", "data": {"method": "foobar", "params": []}}, "id": "1"})
       )
     end
 
@@ -105,7 +105,7 @@ defmodule JSONRPC2.HandlerTest do
             {"jsonrpc": "2.0", "result": 7, "id": "1"},
             {"jsonrpc": "2.0", "result": 19, "id": "2"},
             {"jsonrpc": "2.0", "error": {"code": -32600, "message": "Invalid Request"}, "id": null},
-            {"jsonrpc": "2.0", "error": {"code": -32601, "message": "Method not found"}, "id": "5"},
+            {"jsonrpc": "2.0", "error": {"code": -32601, "message": "Method not found", "data": {"method": "foo.get", "params": {"name": "myself"}}}, "id": "5"},
             {"jsonrpc": "2.0", "result": ["hello", 5], "id": "9"}
         ])
       )
@@ -176,6 +176,23 @@ defmodule JSONRPC2.HandlerTest do
         ~s({"jsonrpc": "2.0", "method": "custom_error", "params": ["bad"], "id": "1"}),
         ~s({"jsonrpc": "2.0", "error": {"code": 404, "message": "Custom not found error", "data": ["bad"]}, "id": "1"})
       )
+    end
+  end
+
+  describe "buggy handlers" do
+    test "handler can raise legit FunctionClauseError, instead of returning :method_not_found" do
+      capture =
+        capture_log fn ->
+          assert_raise(FunctionClauseError, fn ->
+            assert_rpc_noreply(JSONRPC2.BuggyHandler,
+              ~s([
+                  {"jsonrpc": "2.0", "method": "raise_function_clause_error", "id": "1"}
+              ])
+            )
+          end)
+        end
+
+      assert capture =~ "[error] Error in handler JSONRPC2.BuggyHandler for method raise_function_clause_error with params: []"
     end
   end
 
