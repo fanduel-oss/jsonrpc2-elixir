@@ -6,8 +6,7 @@ defmodule JSONRPC2.Servers.HTTP do
   handler within a Plug-based web app (such as Phoenix), please see `JSONRPC2.Servers.HTTP.Plug`.
   """
 
-  alias Plug.Adapters.Cowboy
-  alias JSONRPC2.Servers.HTTP.Plug
+  alias JSONRPC2.Servers.HTTP.Plug, as: JSONRPC2Plug
 
   @doc """
   Returns a supervisor child spec for the given `handler` via `scheme` with `cowboy_opts`.
@@ -20,10 +19,10 @@ defmodule JSONRPC2.Servers.HTTP do
 
   If the server `ref` is not set in `cowboy_opts`, `handler.HTTP` or `handler.HTTPS` is the default.
   """
-  @spec child_spec(:http | :https, module, list) :: Supervisor.Spec.spec
+  @spec child_spec(:http | :https, module, list) :: Supervisor.Spec.spec()
   def child_spec(scheme, handler, cowboy_opts \\ []) do
     cowboy_opts = cowboy_opts ++ [ref: ref(scheme, handler)]
-    Cowboy.child_spec(scheme, Plug, handler, cowboy_opts)
+    cowboy_adapter().child_spec(scheme, JSONRPC2Plug, handler, cowboy_opts)
   end
 
   @doc """
@@ -37,7 +36,7 @@ defmodule JSONRPC2.Servers.HTTP do
   @spec http(module, list) :: {:ok, pid} | {:error, term}
   def http(handler, cowboy_opts \\ []) do
     cowboy_opts = cowboy_opts ++ [ref: ref(:http, handler)]
-    Cowboy.http(Plug, handler, cowboy_opts)
+    cowboy_adapter().http(JSONRPC2Plug, handler, cowboy_opts)
   end
 
   @doc """
@@ -53,7 +52,7 @@ defmodule JSONRPC2.Servers.HTTP do
   @spec https(module, list) :: {:ok, pid} | {:error, term}
   def https(handler, cowboy_opts \\ []) do
     cowboy_opts = cowboy_opts ++ [ref: ref(:https, handler)]
-    Cowboy.https(Plug, handler, cowboy_opts)
+    cowboy_adapter().https(JSONRPC2Plug, handler, cowboy_opts)
   end
 
   defp ref(scheme, handler) do
@@ -69,6 +68,28 @@ defmodule JSONRPC2.Servers.HTTP do
   """
   @spec shutdown(atom) :: :ok | {:error, :not_found}
   def shutdown(ref) do
-    Cowboy.shutdown(ref)
+    cowboy_adapter().shutdown(ref)
+  end
+
+  defp cowboy_adapter() do
+    cowboy_spec =
+      Application.loaded_applications()
+      |> List.keyfind(:cowboy, 0)
+
+    if cowboy_spec do
+      cowboy_spec
+      |> elem(2)
+      |> List.to_string()
+      |> Version.parse!()
+      |> Version.match?("~> 2.0")
+      |> case do
+        true -> Plug.Adapters.Cowboy2
+        false -> Plug.Adapters.Cowboy
+      end
+    else
+      :ok = Application.load(:cowboy)
+
+      cowboy_adapter()
+    end
   end
 end

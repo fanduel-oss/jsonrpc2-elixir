@@ -90,9 +90,17 @@ end
 
 If you plan to use the HTTP(S) server, you also need to add `plug` and `cowboy` to your deps/apps.
 
+For Cowboy 1.x
 ```elixir
 def deps do
   [..., {:plug, "~> 1.3"}, {:cowboy, "~> 1.1"}]
+end
+```
+
+For Cowboy 2.x
+```elixir
+def deps do
+  [..., {:plug, "~> 1.3"}, {:cowboy, "~> 2.4"}]
 end
 ```
 
