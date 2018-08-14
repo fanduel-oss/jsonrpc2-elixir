@@ -30,4 +30,37 @@ defmodule JSONRPC2.HTTPTest do
     expected = [ok: {0, {:ok, 1}}, ok: {1, {:ok, 0}}]
     assert JSONRPC2.Clients.HTTP.batch("http://localhost:#{port}/", batch) == expected
   end
+
+  test "call text/plain", %{port: port} do
+    assert JSONRPC2.Clients.HTTP.call("http://localhost:#{port}/", "subtract", [2, 1], [
+             {"content-type", "text/plain"}
+           ]) == {:ok, 1}
+  end
+
+  test "notify text/plain", %{port: port} do
+    assert JSONRPC2.Clients.HTTP.notify("http://localhost:#{port}/", "subtract", [2, 1], [
+             {"content-type", "text/plain"}
+           ]) == :ok
+  end
+
+  test "batch text/plain", %{port: port} do
+    batch = [{"subtract", [2, 1]}, {"subtract", [2, 1], 0}, {"subtract", [2, 2], 1}]
+    expected = [ok: {0, {:ok, 1}}, ok: {1, {:ok, 0}}]
+
+    assert JSONRPC2.Clients.HTTP.batch("http://localhost:#{port}/", batch, [{"content-type", "text/plain"}]) ==
+             expected
+  end
+
+  test "bad call", %{port: port} do
+    assert {:error, {:http_request_failed, 404, _headers, {:ok, ""}}} =
+             JSONRPC2.Clients.HTTP.call(
+               "http://localhost:#{port}/",
+               "subtract",
+               [2, 1],
+               [
+                 {"content-type", "application/json"}
+               ],
+               :get
+             )
+  end
 end

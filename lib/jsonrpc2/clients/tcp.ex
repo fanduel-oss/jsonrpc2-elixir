@@ -128,6 +128,8 @@ defmodule JSONRPC2.Clients.TCP do
   """
   @spec notify(atom, JSONRPC2.method(), JSONRPC2.params()) :: {:ok, request_id} | {:error, :backlog_full}
   def notify(name, method, params) do
-    :shackle.cast(name, {:notify, method, params}, nil, 0)
+    # Spawn a dead process so responses go to /dev/null
+    pid = spawn(fn -> :ok end)
+    :shackle.cast(name, {:notify, method, params}, pid, 0)
   end
 end

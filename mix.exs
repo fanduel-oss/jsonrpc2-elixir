@@ -1,7 +1,7 @@
 defmodule JSONRPC2.Mixfile do
   use Mix.Project
 
-  @version "1.1.0"
+  @version "1.1.1"
 
   def project do
     [
@@ -43,11 +43,11 @@ defmodule JSONRPC2.Mixfile do
 
   defp deps do
     [
-      {:poison, "~> 3.0 or ~> 2.0", optional: true},
+      {:poison, "~> 4.0 or ~> 3.0 or ~> 2.0", optional: true},
       {:jiffy, "~> 0.14", optional: true},
       {:ranch, "~> 1.2", optional: true},
       {:shackle, "~> 0.3", optional: true},
-      {:plug, "~> 1.1", optional: true},
+      {:plug, "~> 1.3", optional: true},
       {:hackney, "~> 1.6", optional: true},
       {:cowboy, "~> 1.1 or ~> 2.4", optional: true},
       {:ex_doc, "~> 0.12", only: :dev},

@@ -21,7 +21,7 @@ defmodule Handler do
   end
 
   def handle_request("notify", [name]) do
-    IO.puts "You have been notified, #{name}!"
+    IO.puts("You have been notified, #{name}!")
   end
 end
 
@@ -57,20 +57,20 @@ end
 Client.start("localhost", 8000)
 
 # Make a call with the client to the server
-IO.inspect Client.hello("Elixir")
-#=> {:ok, "Hello, Elixir!"}
+IO.inspect(Client.hello("Elixir"))
+# => {:ok, "Hello, Elixir!"}
 
 # Make a call with the client to the server, using named args
-IO.inspect Client.hello2(name: "Elixir")
-#=> {:ok, "Hello again, Elixir!"}
+IO.inspect(Client.hello2(name: "Elixir"))
+# => {:ok, "Hello again, Elixir!"}
 
 # Make a call with the client to the server asynchronously
 {:ok, request_id} = Client.subtract(2, 1)
-IO.puts "non-blocking!"
-#=> non-blocking!
-IO.inspect JSONRPC2.Clients.TCP.receive_response(request_id)
-#=> {:ok, 1}
+IO.puts("non-blocking!")
+# => non-blocking!
+IO.inspect(JSONRPC2.Clients.TCP.receive_response(request_id))
+# => {:ok, 1}
 
 # Notifications
 Client.notify("Elixir")
-#=> You have been notified, Elixir!
+# => You have been notified, Elixir!
