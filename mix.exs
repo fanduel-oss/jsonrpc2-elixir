@@ -43,7 +43,7 @@ defmodule JSONRPC2.Mixfile do
 
   defp deps do
     [
-      {:poison, "~> 4.0 or ~> 3.0 or ~> 2.0", optional: true},
+      {:poison, poison_requirement(Version.match?(System.version(), "~> 1.6")), optional: true},
       {:jiffy, "~> 0.14", optional: true},
       {:ranch, "~> 1.2", optional: true},
       {:shackle, "~> 0.3", optional: true},
@@ -54,6 +54,9 @@ defmodule JSONRPC2.Mixfile do
       {:dialyxir, "~> 0.3", only: :dev}
     ]
   end
+
+  defp poison_requirement(true), do: "~> 4.0 or ~> 3.0 or ~> 2.0"
+  defp poison_requirement(false), do: "~> 3.0 or ~> 2.0"
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
