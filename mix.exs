@@ -55,14 +55,14 @@ defmodule JSONRPC2.Mixfile do
     ]
   end
 
+  {:ok, poison_requirement_version_requirement} = Version.parse_requirement("~> 1.6")
+  @poison_requirement_version_requirement poison_requirement_version_requirement
+
   defp poison_requirement do
-    if function_exported?(System, :version, 0) do
-      System.version()
-      |> Version.match?("~> 1.6")
-      |> poison_requirement()
-    else
-      poison_requirement(false)
-    end
+    System.version()
+    |> Version.parse!()
+    |> Version.match?(@poison_requirement_version_requirement)
+    |> poison_requirement()
   end
 
   defp poison_requirement(true), do: "~> 4.0 or ~> 3.0 or ~> 2.0"
