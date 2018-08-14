@@ -2,7 +2,7 @@ defmodule JSONRPC2.HTTPTest do
   use ExUnit.Case, async: true
 
   setup do
-    port = :rand.uniform(65535 - 1000) + 1000
+    port = :rand.uniform(65535 - 1025) + 1025
     {:ok, pid} = JSONRPC2.Servers.HTTP.http(JSONRPC2.SpecHandler, port: port)
 
     on_exit(fn ->
