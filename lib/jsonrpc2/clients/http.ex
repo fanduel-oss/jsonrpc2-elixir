@@ -7,8 +7,6 @@ defmodule JSONRPC2.Clients.HTTP do
 
   @type batch_result :: {:ok, JSONRPC2.Response.id_and_response()} | {:error, any}
 
-  @default_id "0"
-
   @doc """
   Make a call to `url` for JSON-RPC 2.0 `method` with `params`.
 
@@ -19,7 +17,7 @@ defmodule JSONRPC2.Clients.HTTP do
   """
 
   @spec call(String.t(), JSONRPC2.method(), JSONRPC2.params(), any, atom, list, JSONRPC2.id()) ::
-          {:ok, any} | {:ok, {JSONRPC2.id(), any}} | {:error, any}
+          {:ok, any} | {:error, any}
   def call(
         url,
         method,
@@ -27,7 +25,7 @@ defmodule JSONRPC2.Clients.HTTP do
         headers \\ @default_headers,
         http_method \\ :post,
         hackney_opts \\ [],
-        request_id \\ @default_id
+        request_id \\ "0"
       ) do
     serializer = Application.get_env(:jsonrpc2, :serializer)
     {:ok, payload} = JSONRPC2.Request.serialized_request({method, params, id}, serializer)
@@ -38,11 +36,7 @@ defmodule JSONRPC2.Clients.HTTP do
       {:ok, body} <- :hackney.body(body_ref),
       {:ok, {id, result}} <- JSONRPC2.Response.deserialize_response(body, serializer)
     ) do
-      if id == @default_id do
-        result
-      else
-        {:ok, {id, result}}
-      end
+      result
     else
       {:ok, status_code, headers, body_ref} ->
         {:error, {:http_request_failed, status_code, headers, :hackney.body(body_ref)}}
