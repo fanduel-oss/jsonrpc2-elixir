@@ -7,6 +7,8 @@ defmodule JSONRPC2.Clients.HTTP do
 
   @type batch_result :: {:ok, JSONRPC2.Response.id_and_response()} | {:error, any}
 
+  @default_id "0"
+
   @doc """
   Make a call to `url` for JSON-RPC 2.0 `method` with `params`.
 
@@ -25,7 +27,7 @@ defmodule JSONRPC2.Clients.HTTP do
         headers \\ @default_headers,
         http_method \\ :post,
         hackney_opts \\ [],
-        request_id \\ "0"
+        request_id \\ @default_id
       ) do
     serializer = Application.get_env(:jsonrpc2, :serializer)
     {:ok, payload} = JSONRPC2.Request.serialized_request({method, params, id}, serializer)
@@ -39,7 +41,7 @@ defmodule JSONRPC2.Clients.HTTP do
       if id == @default_id do
         result
       else
-        {id, result}
+        {:ok, {id, result}}
       end
     else
       {:ok, status_code, headers, body_ref} ->
