@@ -10,12 +10,13 @@ defmodule JSONRPC2.Clients.HTTP do
   @doc """
   Make a call to `url` for JSON-RPC 2.0 `method` with `params`.
 
-  You can also pass `headers`, `http_method`, and `hackney_opts` to customize the options for
-  hackney.
+  You can also pass `headers`, `http_method`, `hackney_opts` to customize the options for
+  hackney, and `request_id` for a custom JSON-RPC 2.0 request ID.
 
   See [hackney](https://github.com/benoitc/hackney) for more information on the available options.
   """
-  @spec call(String.t(), JSONRPC2.method(), JSONRPC2.params(), any, atom, list) ::
+
+  @spec call(String.t(), JSONRPC2.method(), JSONRPC2.params(), any, atom, list, JSONRPC2.id()) ::
           {:ok, any} | {:error, any}
   def call(
         url,
@@ -23,16 +24,17 @@ defmodule JSONRPC2.Clients.HTTP do
         params,
         headers \\ @default_headers,
         http_method \\ :post,
-        hackney_opts \\ []
+        hackney_opts \\ [],
+        request_id \\ "0"
       ) do
     serializer = Application.get_env(:jsonrpc2, :serializer)
-    {:ok, payload} = JSONRPC2.Request.serialized_request({method, params, "0"}, serializer)
+    {:ok, payload} = JSONRPC2.Request.serialized_request({method, params, request_id}, serializer)
     response = :hackney.request(http_method, url, headers, payload, hackney_opts)
 
     with(
       {:ok, 200, _headers, body_ref} <- response,
       {:ok, body} <- :hackney.body(body_ref),
-      {:ok, {_, result}} <- JSONRPC2.Response.deserialize_response(body, serializer)
+      {:ok, {_id, result}} <- JSONRPC2.Response.deserialize_response(body, serializer)
     ) do
       result
     else
