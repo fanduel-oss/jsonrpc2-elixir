@@ -16,7 +16,7 @@ defmodule Handler do
   end
 
   def handle_request("notify", [name]) do
-    IO.puts "You have been notified, #{name}!"
+    IO.puts("You have been notified, #{name}!")
   end
 end
 
@@ -43,13 +43,13 @@ defmodule Client do
 end
 
 # Make a call with the client to the server
-IO.inspect Client.hello("Elixir")
-#=> {:ok, "Hello, Elixir!"}
+IO.inspect(Client.hello("Elixir"))
+# => {:ok, "Hello, Elixir!"}
 
 # Make a call with the client to the server, using named args
-IO.inspect Client.hello2(name: "Elixir")
-#=> {:ok, "Hello again, Elixir!"}
+IO.inspect(Client.hello2(name: "Elixir"))
+# => {:ok, "Hello again, Elixir!"}
 
 # Notifications
 Client.notify("Elixir")
-#=> You have been notified, Elixir!
+# => You have been notified, Elixir!

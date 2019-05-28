@@ -3,21 +3,30 @@ defmodule JSONRPC2.Clients.HTTP do
   A client for JSON-RPC 2.0 using an HTTP transport with JSON in the body.
   """
 
-  @type batch_result :: {:ok, JSONRPC2.Response.id_and_response()} | {:error, any}
+  @default_headers [{"content-type", "application/json"}]
 
-  @default_id 0
+  @type batch_result :: {:ok, JSONRPC2.Response.id_and_response()} | {:error, any}
 
   @doc """
   Make a call to `url` for JSON-RPC 2.0 `method` with `params`.
 
   You can also pass `headers`, `http_method`, `hackney_opts` to customize the options for
-  hackney, and `id` for a custom id.
+  hackney, and `request_id` for a custom JSON-RPC 2.0 request ID.
 
   See [hackney](https://github.com/benoitc/hackney) for more information on the available options.
   """
+
   @spec call(String.t(), JSONRPC2.method(), JSONRPC2.params(), any, atom, list, JSONRPC2.id()) ::
-          {:ok, any} | JSONRPC2.Response.id_and_response | {:error, any}
-  def call(url, method, params, headers \\ [], http_method \\ :post, hackney_opts \\ [], id \\ @default_id) do
+          {:ok, any} | {:error, any}
+  def call(
+        url,
+        method,
+        params,
+        headers \\ @default_headers,
+        http_method \\ :post,
+        hackney_opts \\ [],
+        request_id \\ "0"
+      ) do
     serializer = Application.get_env(:jsonrpc2, :serializer)
     {:ok, payload} = JSONRPC2.Request.serialized_request({method, params, id}, serializer)
     response = :hackney.request(http_method, url, headers, payload, hackney_opts)
@@ -53,7 +62,7 @@ defmodule JSONRPC2.Clients.HTTP do
   See [hackney](https://github.com/benoitc/hackney) for more information on the available options.
   """
   @spec notify(String.t(), JSONRPC2.method(), JSONRPC2.params(), any, atom, list) :: :ok | {:error, any}
-  def notify(url, method, params, headers \\ [], http_method \\ :post, hackney_opts \\ []) do
+  def notify(url, method, params, headers \\ @default_headers, http_method \\ :post, hackney_opts \\ []) do
     serializer = Application.get_env(:jsonrpc2, :serializer)
     {:ok, payload} = JSONRPC2.Request.serialized_request({method, params}, serializer)
 
@@ -74,7 +83,7 @@ defmodule JSONRPC2.Clients.HTTP do
   """
   @spec batch(String.t(), [JSONRPC2.Request.request()], any, atom, list) ::
           [batch_result] | :ok | {:error, any}
-  def batch(url, requests, headers \\ [], http_method \\ :post, hackney_opts \\ []) do
+  def batch(url, requests, headers \\ @default_headers, http_method \\ :post, hackney_opts \\ []) do
     serializer = Application.get_env(:jsonrpc2, :serializer)
 
     {:ok, payload} =

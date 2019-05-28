@@ -61,6 +61,8 @@ end
 defmodule JSONRPC2.BuggyHandler do
   use JSONRPC2.Server.Handler
 
+  @dialyzer [:no_return, :no_opaque]
+
   def handle_request("raise_function_clause_error", []) do
     String.contains?(5, 5)
   end

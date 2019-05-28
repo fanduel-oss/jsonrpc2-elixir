@@ -135,9 +135,9 @@ defmodule JSONRPC2.Server.Handler do
             standard_error_response(:method_not_found, %{method: method, params: params}, id)
 
           other_e ->
-            original_stacktrace = System.stacktrace()
-            log_error(module, method, params, :error, other_e)
-            Kernel.reraise(other_e, original_stacktrace)
+            stacktrace = System.stacktrace()
+            log_error(module, method, params, :error, other_e, stacktrace)
+            Kernel.reraise(other_e, stacktrace)
         end
     catch
       :throw, error when error in @throwable_errors ->
@@ -153,7 +153,8 @@ defmodule JSONRPC2.Server.Handler do
         error_response(code, message, data, id)
 
       kind, payload ->
-        log_error(module, method, params, kind, payload)
+        stacktrace = System.stacktrace()
+        log_error(module, method, params, kind, payload, stacktrace)
 
         standard_error_response(:internal_error, id)
     end
@@ -163,7 +164,7 @@ defmodule JSONRPC2.Server.Handler do
     standard_error_response(:invalid_request, nil)
   end
 
-  defp log_error(module, method, params, kind, payload) do
+  defp log_error(module, method, params, kind, payload, stacktrace) do
     _ =
       Logger.error([
         "Error in handler ",
@@ -173,7 +174,7 @@ defmodule JSONRPC2.Server.Handler do
         " with params: ",
         inspect(params),
         ":\n\n",
-        Exception.format(kind, payload, System.stacktrace())
+        Exception.format(kind, payload, stacktrace)
       ])
   end
 

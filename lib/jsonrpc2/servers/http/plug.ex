@@ -12,43 +12,91 @@ defmodule JSONRPC2.Servers.HTTP.Plug do
 
   The above code will mount the handler `YourJSONRPC2HandlerModule` at the path
   "/jsonrpc".
+
+  The `Plug.Parsers` module for JSON is automatically included in the pipeline,
+  and will use the same serializer as is defined in the `:serializer` key of the
+  `:jsonrpc2` application. You can override the default options (which are used
+  in this example) like so:
+
+      forward "/jsonrpc", JSONRPC2.Servers.HTTP.Plug, [
+        handler: YourJSONRPC2HandlerModule,
+        plug_parsers_opts: [
+          parsers: [:json],
+          pass: ["*/*"],
+          json_decoder: Application.get_env(:jsonrpc2, :serializer)
+        ]
+      ]
   """
 
+  use Plug.Builder
+
+  def init(opts) when is_list(opts) do
+    Keyword.merge(
+      [
+        plug_parsers_opts: [
+          parsers: [:json],
+          pass: ["*/*"],
+          json_decoder: Application.get_env(:jsonrpc2, :serializer)
+        ]
+      ],
+      opts
+    )
+    |> Map.new()
+  end
+
+  def init(handler) when is_atom(handler) do
+    init(handler: handler)
+  end
+
+  plug(:wrap_plug_parsers, builder_opts())
+  plug(:handle_jsonrpc2, builder_opts())
+
   @doc false
-  def init(handler) do
-    handler
+  def wrap_plug_parsers(conn, %{plug_parsers_opts: plug_parsers_opts}) do
+    Plug.Parsers.call(conn, Plug.Parsers.init(plug_parsers_opts))
   end
 
   @doc false
-  def call(%{method: "POST"} = conn, handler) do
-    req_body =
-      cond do
-        Plug.Conn.get_req_header(conn, "content-type")
-        |> Enum.member?("application/json") && conn.params != %{} && conn.params != %Plug.Conn.Unfetched{} ->
-          conn.params
+  def handle_jsonrpc2(%{method: "POST", body_params: body_params} = conn, opts) do
+    handle_jsonrpc2(conn, body_params, opts)
+  end
 
-        true ->
-          get_plain_body(conn)
-      end
+  def handle_jsonrpc2(conn, _opts) do
+    resp(conn, 404, "")
+  end
 
+  defp handle_jsonrpc2(conn, %Plug.Conn.Unfetched{}, opts) do
+    {body, conn} = get_body(conn)
+    do_handle_jsonrpc2(conn, body, opts)
+  end
+
+  defp handle_jsonrpc2(conn, %{"_json" => body_params}, opts),
+    do: do_handle_jsonrpc2(conn, body_params, opts)
+
+  defp handle_jsonrpc2(conn, body_params, opts), do: do_handle_jsonrpc2(conn, body_params, opts)
+
+  defp do_handle_jsonrpc2(conn, body_params, %{handler: handler}) do
     resp_body =
-      case handler.handle(req_body) do
+      case handler.handle(body_params) do
         {:reply, reply} -> reply
         :noreply -> ""
       end
 
     conn
-    |> Plug.Conn.put_resp_header("content-type", "application/json")
-    |> Plug.Conn.resp(200, resp_body)
+    |> put_resp_header("content-type", "application/json")
+    |> resp(200, resp_body)
   end
 
-  def call(conn, _) do
-    conn
-    |> Plug.Conn.resp(404, "")
-  end
+  defp get_body(so_far \\ [], conn) do
+    case read_body(conn) do
+      {:ok, body, conn} ->
+        {IO.iodata_to_binary([so_far | body]), conn}
 
-  defp get_plain_body(conn) do
-    {:ok, req_body, _} = Plug.Conn.read_body(conn)
-    req_body
+      {:more, partial_body, conn} ->
+        get_body([so_far | partial_body], conn)
+
+      {:error, reason} ->
+        raise Plug.Parsers.ParseError, exception: Exception.normalize(:error, reason)
+    end
   end
 end
