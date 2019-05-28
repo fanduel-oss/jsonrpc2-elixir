@@ -26,7 +26,7 @@ defmodule JSONRPC2.Clients.HTTP do
         hackney_opts \\ []
       ) do
     serializer = Application.get_env(:jsonrpc2, :serializer)
-    {:ok, payload} = JSONRPC2.Request.serialized_request({method, params, 0}, serializer)
+    {:ok, payload} = JSONRPC2.Request.serialized_request({method, params, "0"}, serializer)
     response = :hackney.request(http_method, url, headers, payload, hackney_opts)
 
     with(
