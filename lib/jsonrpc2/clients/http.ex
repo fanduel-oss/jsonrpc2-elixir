@@ -34,7 +34,7 @@ defmodule JSONRPC2.Clients.HTTP do
     with(
       {:ok, 200, _headers, body_ref} <- response,
       {:ok, body} <- :hackney.body(body_ref),
-      {:ok, {id, result}} <- JSONRPC2.Response.deserialize_response(body, serializer)
+      {:ok, {_id, result}} <- JSONRPC2.Response.deserialize_response(body, serializer)
     ) do
       result
     else
