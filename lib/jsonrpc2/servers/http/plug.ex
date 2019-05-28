@@ -31,8 +31,6 @@ defmodule JSONRPC2.Servers.HTTP.Plug do
   use Plug.Builder
 
   def init(opts) when is_list(opts) do
-    handler = Keyword.fetch!(opts, :handler)
-
     Keyword.merge(
       [
         plug_parsers_opts: [
