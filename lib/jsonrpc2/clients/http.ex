@@ -19,7 +19,7 @@ defmodule JSONRPC2.Clients.HTTP do
   """
 
   @spec call(String.t(), JSONRPC2.method(), JSONRPC2.params(), any, atom, list, JSONRPC2.id()) ::
-          {:ok, any} | {:error, any}
+          {:ok, any} | {:ok, {JSONRPC2.id(), any}} | {:error, any}
   def call(
         url,
         method,
