@@ -83,7 +83,7 @@ defmodule JSONRPC2.Servers.HTTP do
       |> Version.parse!()
       |> Version.match?("~> 2.0")
       |> case do
-        true -> Plug.Adapters.Cowboy2
+        true -> Plug.Cowboy
         false -> Plug.Adapters.Cowboy
       end
     else

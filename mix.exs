@@ -31,7 +31,7 @@ defmodule JSONRPC2.Mixfile do
           :shackle_pool,
           Plug.Conn,
           Plug.Adapters.Cowboy,
-          Plug.Adapters.Cowboy2
+          Plug.Cowboy
         ]
       ]
     ]
