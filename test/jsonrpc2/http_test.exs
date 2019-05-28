@@ -22,7 +22,7 @@ defmodule JSONRPC2.HTTPTest do
   end
 
   test "call with custom id", %{port: port} do
-    expected = {123, {:ok, 1}}
+    expected = {:ok, 1}
     actual = JSONRPC2.Clients.HTTP.call("http://localhost:#{port}/", "subtract", [2, 1], [], :post, [], 123)
     assert actual == expected
   end
