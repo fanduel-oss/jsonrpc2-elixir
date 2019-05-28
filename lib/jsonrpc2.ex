@@ -1,6 +1,6 @@
 defmodule JSONRPC2 do
   @moduledoc ~S"""
-  `JSONRPC2` is an Elixir library for JSON-RPC 2.0.
+  `JSONRPC2` is an Elixir library for JSON-RPC 2.0.
 
   It includes request and response utility modules, a transport-agnostic server handler, a
   line-based TCP server and client, which are based on [Ranch](https://github.com/ninenines/ranch)
@@ -136,7 +136,7 @@ defmodule JSONRPC2 do
 
   ## Serializers
 
-  Any module which conforms to the same API as Poison's `Poison.encode/1` and `Poison.decode/1` can
+  Any module which conforms to the same API as Jason's `Jason.encode/1` and `Jason.decode/1` can
   be provided as a serializer to the functions which accept them.
   """
 

@@ -10,27 +10,19 @@ See the [`examples`](https://github.com/fanduel/jsonrpc2-elixir/tree/master/exam
 
 ## Installation
 
-1. Add `jsonrpc2` and `poison` to your list of dependencies in `mix.exs`:
+Add `jsonrpc2` and `jason` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [{:jsonrpc2, "~> 1.0"}, {:poison, "~> 3.1"}]
-end
-```
-
-2. Ensure `jsonrpc2` and`poison` are started before your application:
-
-```elixir
-def application do
-  [applications: [:jsonrpc2, :poison]]
+  [{:jsonrpc2, "~> 1.0"}, {:jason, "~> 1.0"}]
 end
 ```
 
 ## Serialization
 
-Uses `poison` by default, but you can use any serializer (it doesn't even have to be JSON, technically).
+Uses `jason` by default, but you can use any serializer (it doesn't even have to be JSON, technically).
 
-A serializer for `jiffy` is included as `JSONRPC2.Serializers.Jiffy`.
+A serializer for `jiffy` is included as `JSONRPC2.Serializers.Jiffy`, and legacy users can select `Poison` if they have included it as a dependency.
 
 To use a different serializer you must configure it in your Mix config. For the `jiffy` serializer:
 
@@ -38,35 +30,23 @@ To use a different serializer you must configure it in your Mix config. For the 
 config :jsonrpc2, :serializer, JSONRPC2.Serializers.Jiffy
 ```
 
-If you are going to use the `jiffy` serializer, you must add it to your deps and applications instead of `poison`:
+If you are going to use the `jiffy` serializer, you must add it to your deps instead of `jason`:
 
 ```elixir
 def deps do
-  [..., {:jiffy, "~> 0.14"}]
+  [..., {:jiffy, "~> 1.0"}]
 end
 ```
 
-```elixir
-def application do
-  [applications: [..., :jiffy]]
-end
-```
-
-If you use your own serializer, you do not (necessarily) need to add `poison` or `jiffy` to your deps/apps.
+If you use your own serializer, you do not (necessarily) need to add `jason` or `jiffy` to your deps.
 
 ## TCP/TLS server
 
-If you plan to use the TCP/TLS server, you also need to add `ranch` to your deps/apps.
+If you plan to use the TCP/TLS server, you also need to add `ranch` to your deps.
 
 ```elixir
 def deps do
-  [..., {:ranch, "~> 1.3"}]
-end
-```
-
-```elixir
-def application do
-  [applications: [..., :ranch]]
+  [..., {:ranch, "~> 1.7"}]
 end
 ```
 
@@ -80,48 +60,22 @@ def deps do
 end
 ```
 
-```elixir
-def application do
-  [applications: [..., :shackle]]
-end
-```
-
 ## HTTP(S) server
 
-If you plan to use the HTTP(S) server, you also need to add `plug` and `cowboy` to your deps/apps.
+If you plan to use the HTTP(S) server, you also need to add `plug`, `cowboy`, and `plug_cowboy` to your deps.
 
-For Cowboy 1.x
 ```elixir
 def deps do
-  [..., {:plug, "~> 1.3"}, {:cowboy, "~> 1.1"}]
-end
-```
-
-For Cowboy 2.x
-```elixir
-def deps do
-  [..., {:plug, "~> 1.3"}, {:cowboy, "~> 2.4"}]
-end
-```
-
-```elixir
-def application do
-  [applications: [..., :plug, :cowboy]]
+  [..., {:plug, "~> 1.8"}, {:cowboy, "~> 2.6"}, {:plug_cowboy, "~> 2.0}]
 end
 ```
 
 ## HTTP(S) client
 
-If you plan to use the HTTP(S) client, you also need to add `hackney` to your deps/apps.
+If you plan to use the HTTP(S) client, you also need to add `hackney` to your deps.
 
 ```elixir
 def deps do
-  [..., {:hackney, "~> 1.7"}]
-end
-```
-
-```elixir
-def application do
-  [applications: [..., :hackney]]
+  [..., {:hackney, "~> 1.15"}]
 end
 ```

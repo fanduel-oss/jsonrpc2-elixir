@@ -14,7 +14,7 @@ defmodule JSONRPC2.Servers.HTTP do
   Allows you to embed a server directly in your app's supervision tree, rather than letting
   Plug/Cowboy handle it.
 
-  Please see the docs for [Plug](https://hexdocs.pm/plug/Plug.Adapters.Cowboy.html) for the values
+  Please see the docs for [Plug.Cowboy](https://hexdocs.pm/plug_cowboy/Plug.Cowboy.html) for the values
   which are allowed in `cowboy_opts`.
 
   If the server `ref` is not set in `cowboy_opts`, `handler.HTTP` or `handler.HTTPS` is the default.
@@ -28,7 +28,7 @@ defmodule JSONRPC2.Servers.HTTP do
   @doc """
   Starts an HTTP server for the given `handler` with `cowboy_opts`.
 
-  Please see the docs for [Plug](https://hexdocs.pm/plug/Plug.Adapters.Cowboy.html) for the values
+  Please see the docs for [Plug.Cowboy](https://hexdocs.pm/plug_cowboy/Plug.Cowboy.html) for the values
   which are allowed in `cowboy_opts`.
 
   If the server `ref` is not set in `cowboy_opts`, `handler.HTTP` is the default.
@@ -42,10 +42,10 @@ defmodule JSONRPC2.Servers.HTTP do
   @doc """
   Starts an HTTPS server for the given `handler` with `cowboy_opts`.
 
-  Please see the docs for [Plug](https://hexdocs.pm/plug/Plug.Adapters.Cowboy.html) for the values
+  Please see the docs for [Plug.Cowboy](https://hexdocs.pm/plug_cowboy/Plug.Cowboy.html) for the values
   which are allowed in `cowboy_opts`. In addition to the normal `cowboy_opts`, this function also
   accepts the same extra SSL-related options as
-  [Plug.Adapters.Cowboy.https/3](https://hexdocs.pm/plug/Plug.Adapters.Cowboy.html#https/3).
+  [Plug.Cowboy.https/3](https://hexdocs.pm/plug_cowboy/Plug.Cowboy.html#https/3).
 
   If the server `ref` is not set in `cowboy_opts`, `handler.HTTPS` is the default.
   """
@@ -83,7 +83,7 @@ defmodule JSONRPC2.Servers.HTTP do
       |> Version.parse!()
       |> Version.match?("~> 2.0")
       |> case do
-        true -> Plug.Adapters.Cowboy2
+        true -> Plug.Cowboy
         false -> Plug.Adapters.Cowboy
       end
     else

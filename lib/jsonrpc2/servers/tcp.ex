@@ -16,7 +16,7 @@ defmodule JSONRPC2.Servers.TCP do
     * `num_acceptors` - number of acceptor processes to start. Defaults to 100.
     * `transport` - ranch transport to use. Defaults to `:ranch_tcp`.
     * `transport_opts` - ranch transport options. For `:ranch_tcp`, see
-      [here](http://ninenines.eu/docs/en/ranch/1.2/manual/ranch_tcp/).
+      [here](http://ninenines.eu/docs/en/ranch/1.7/manual/ranch_tcp/).
     * `timeout` - disconnect after this amount of milliseconds without a packet from a client.
       Defaults to 1 hour.
   """
@@ -37,7 +37,7 @@ defmodule JSONRPC2.Servers.TCP do
     * `num_acceptors` - number of acceptor processes to start. Defaults to 100.
     * `transport` - ranch transport to use. Defaults to `:ranch_tcp`.
     * `transport_opts` - ranch transport options. For `:ranch_tcp`, see
-      [here](http://ninenines.eu/docs/en/ranch/1.2/manual/ranch_tcp/).
+      [here](http://ninenines.eu/docs/en/ranch/1.7/manual/ranch_tcp/).
     * `timeout` - disconnect after this amount of milliseconds without a packet from a client.
       Defaults to 1 hour.
   """
