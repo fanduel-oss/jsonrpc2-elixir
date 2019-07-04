@@ -22,7 +22,7 @@ defmodule JSONRPC2.Servers.HTTP do
   @spec child_spec(:http | :https, module, list) :: Supervisor.Spec.spec()
   def child_spec(scheme, handler, cowboy_opts \\ []) do
     cowboy_opts = cowboy_opts ++ [ref: ref(scheme, handler)]
-    cowboy_adapter().child_spec(scheme, JSONRPC2Plug, handler, cowboy_opts)
+    cowboy_adapter().child_spec(scheme: scheme, plug: {JSONRPC2Plug, handler}, options: cowboy_opts)
   end
 
   @doc """
