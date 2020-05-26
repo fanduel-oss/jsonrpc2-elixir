@@ -66,7 +66,7 @@ If you plan to use the HTTP(S) server, you also need to add `plug`, `cowboy`, an
 
 ```elixir
 def deps do
-  [..., {:plug, "~> 1.8"}, {:cowboy, "~> 2.6"}, {:plug_cowboy, "~> 2.0}]
+  [..., {:plug, "~> 1.8"}, {:cowboy, "~> 2.6"}, {:plug_cowboy, "~> 2.0"}]
 end
 ```
 
