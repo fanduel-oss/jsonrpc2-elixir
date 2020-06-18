@@ -80,5 +80,15 @@ defmodule JSONRPC2.HTTPTest do
              ],
              :post
            ) == {:ok, 1}
+
+    assert JSONRPC2.Clients.HTTP.call(
+             "http://localhost:#{port}/",
+             "subtract",
+             %{minuend: 2, subtrahend: 1},
+             [
+               {"content-type", "application/json"}
+             ],
+             :post
+           ) == {:ok, 1}
   end
 end
