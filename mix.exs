@@ -44,7 +44,7 @@ defmodule JSONRPC2.Mixfile do
     [
       {:jason, "~> 1.0", optional: true},
       {:poison, poison_requirement(), optional: true},
-      {:jiffy, " ~> 1.0 or ~> 0.14", optional: true},
+      {:jiffy, "~> 1.0 or ~> 0.14", optional: true},
       {:shackle, "~> 0.3", optional: true},
       {:ranch, "~> 1.2", optional: true},
       {:hackney, "~> 1.6", optional: true},
