@@ -7,7 +7,7 @@ for line_packet <- [false, true] do
     end
 
   defmodule module_name do
-    use ExUnit.Case, async: true
+    use ExUnit.Case
 
     setup do
       port = :rand.uniform(65535 - 1025) + 1025

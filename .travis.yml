@@ -1,3 +1,4 @@
+os: linux
 dist: bionic
 language: elixir
 elixir:
@@ -5,6 +6,7 @@ elixir:
   - 1.9
   - 1.10
 otp_release:
-  - 20.3.8.22
   - 21.2
   - 22.3.4
+  # uncomment when jiffy fixes itself for 23
+  # - 23.0.2 

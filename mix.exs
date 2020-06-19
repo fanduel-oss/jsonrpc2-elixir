@@ -43,7 +43,7 @@ defmodule JSONRPC2.Mixfile do
   defp deps do
     [
       {:jason, "~> 1.0", optional: true},
-      {:poison, poison_requirement(), optional: true},
+      {:poison, "~> 4.0 or ~> 3.0 or ~> 2.0", optional: true},
       {:jiffy, "~> 1.0 or ~> 0.14", optional: true},
       {:shackle, "~> 0.3", optional: true},
       {:ranch, "~> 1.2", optional: true},
@@ -55,19 +55,6 @@ defmodule JSONRPC2.Mixfile do
     ]
   end
 
-  {:ok, poison_requirement_version_requirement} = Version.parse_requirement("~> 1.6")
-  @poison_requirement_version_requirement poison_requirement_version_requirement
-
-  defp poison_requirement do
-    System.version()
-    |> Version.parse!()
-    |> Version.match?(@poison_requirement_version_requirement)
-    |> poison_requirement()
-  end
-
-  defp poison_requirement(true), do: "~> 4.0 or ~> 3.0 or ~> 2.0"
-  defp poison_requirement(false), do: "~> 3.0 or ~> 2.0"
-
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
 
@@ -78,7 +65,10 @@ defmodule JSONRPC2.Mixfile do
   defp package do
     [
       licenses: ["Apache 2.0"],
-      links: %{"GitHub" => "https://github.com/fanduel/jsonrpc2-elixir"},
+      links: %{
+        "Important v2.0 Upgrade Information" => "https://hexdocs.pm/jsonrpc2/readme.html#v2-0-upgrade",
+        "GitHub" => "https://github.com/fanduel/jsonrpc2-elixir"
+      },
       files: ~w(mix.exs README.md LICENSE lib)
     ]
   end
