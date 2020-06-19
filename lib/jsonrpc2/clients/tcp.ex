@@ -25,6 +25,14 @@ defmodule JSONRPC2.Clients.TCP do
   You can optionally pass `client_opts`, detailed
   [here](https://github.com/lpgauth/shackle#client_options), as well as `pool_opts`, detailed
   [here](https://github.com/lpgauth/shackle#pool_options).
+
+  In addition to the `client_opts` above, you can also pass:
+    * `line_packet` - by default, packets consist of a 4 byte header containing an unsigned integer
+    in big-endian byte order specifying the number of bytes in the packet, followed by that
+    number of bytes (equivalent to the
+    [erlang inet packet type `4`](https://erlang.org/doc/man/inet.html#packet)). If set to
+    `true`, packets will instead be terminated by line-endings, for compatibility with older
+    implementations.
   """
   @spec start(host, :inet.port_number(), atom, Keyword.t(), Keyword.t()) :: :ok
   def start(host, port, name, client_opts \\ [], pool_opts \\ []) do
@@ -42,8 +50,14 @@ defmodule JSONRPC2.Clients.TCP do
           host
       end
 
-    client_opts = Keyword.merge([ip: ip, port: port, socket_options: [:binary, packet: :line]], client_opts)
-    :shackle_pool.start(name, Protocol, client_opts, pool_opts)
+    line_packet = Keyword.get(client_opts, :line_packet)
+    protocol = if line_packet, do: Protocol.LineTerminated, else: Protocol
+    packet = if line_packet, do: :line, else: 4
+
+    client_opts =
+      Keyword.merge([ip: ip, port: port, socket_options: [:binary, packet: packet]], client_opts)
+
+    :shackle_pool.start(name, protocol, client_opts, pool_opts)
   end
 
   @doc """

@@ -1,48 +1,61 @@
-defmodule JSONRPC2.TCPTest do
-  use ExUnit.Case, async: true
+for line_packet <- [false, true] do
+  module_name =
+    if line_packet do
+      JSONRPC2.TCPTest.LineTerminated
+    else
+      JSONRPC2.TCPTest
+    end
 
-  setup do
-    port = :rand.uniform(65535 - 1025) + 1025
+  defmodule module_name do
+    use ExUnit.Case, async: true
 
-    {:ok, pid} = JSONRPC2.Servers.TCP.start_listener(JSONRPC2.SpecHandler, port, name: __MODULE__)
+    setup do
+      port = :rand.uniform(65535 - 1025) + 1025
 
-    :ok = JSONRPC2.Clients.TCP.start("localhost", port, __MODULE__)
+      {:ok, pid} =
+        JSONRPC2.Servers.TCP.start_listener(JSONRPC2.SpecHandler, port,
+          name: __MODULE__,
+          line_packet: unquote(line_packet)
+        )
 
-    on_exit(fn ->
-      ref = Process.monitor(pid)
-      JSONRPC2.Clients.TCP.stop(__MODULE__)
-      JSONRPC2.Servers.TCP.stop(__MODULE__)
+      :ok = JSONRPC2.Clients.TCP.start("localhost", port, __MODULE__, line_packet: unquote(line_packet))
 
-      receive do
-        {:DOWN, ^ref, :process, ^pid, :shutdown} -> :ok
-      end
-    end)
-  end
+      on_exit(fn ->
+        ref = Process.monitor(pid)
+        JSONRPC2.Clients.TCP.stop(__MODULE__)
+        JSONRPC2.Servers.TCP.stop(__MODULE__)
 
-  test "call" do
-    assert JSONRPC2.Clients.TCP.call(__MODULE__, "subtract", [2, 1]) == {:ok, 1}
+        receive do
+          {:DOWN, ^ref, :process, ^pid, :shutdown} -> :ok
+        end
+      end)
+    end
 
-    assert JSONRPC2.Clients.TCP.call(__MODULE__, "subtract", [2, 1], true) == {:ok, 1}
+    test "call" do
+      assert JSONRPC2.Clients.TCP.call(__MODULE__, "subtract", [2, 1]) == {:ok, 1}
 
-    assert JSONRPC2.Clients.TCP.call(__MODULE__, "subtract", [2, 1], string_id: true) == {:ok, 1}
+      assert JSONRPC2.Clients.TCP.call(__MODULE__, "subtract", [2, 1], true) == {:ok, 1}
 
-    assert JSONRPC2.Clients.TCP.call(__MODULE__, "subtract", [2, 1], timeout: 2_000) == {:ok, 1}
-  end
+      assert JSONRPC2.Clients.TCP.call(__MODULE__, "subtract", [2, 1], string_id: true) == {:ok, 1}
 
-  test "cast" do
-    {:ok, request_id} = JSONRPC2.Clients.TCP.cast(__MODULE__, "subtract", [2, 1], timeout: 1_000)
-    assert JSONRPC2.Clients.TCP.receive_response(request_id) == {:ok, 1}
+      assert JSONRPC2.Clients.TCP.call(__MODULE__, "subtract", [2, 1], timeout: 2_000) == {:ok, 1}
+    end
 
-    {:ok, request_id} = JSONRPC2.Clients.TCP.cast(__MODULE__, "subtract", [2, 1], true)
-    assert JSONRPC2.Clients.TCP.receive_response(request_id) == {:ok, 1}
+    test "cast" do
+      {:ok, request_id} = JSONRPC2.Clients.TCP.cast(__MODULE__, "subtract", [2, 1], timeout: 1_000)
+      assert JSONRPC2.Clients.TCP.receive_response(request_id) == {:ok, 1}
 
-    {:ok, request_id} =
-      JSONRPC2.Clients.TCP.cast(__MODULE__, "subtract", [2, 1], string_id: true, timeout: 2_000)
+      {:ok, request_id} = JSONRPC2.Clients.TCP.cast(__MODULE__, "subtract", [2, 1], true)
+      assert JSONRPC2.Clients.TCP.receive_response(request_id) == {:ok, 1}
 
-    assert JSONRPC2.Clients.TCP.receive_response(request_id) == {:ok, 1}
-  end
+      {:ok, request_id} =
+        JSONRPC2.Clients.TCP.cast(__MODULE__, "subtract", [2, 1], string_id: true, timeout: 2_000)
 
-  test "notify" do
-    {:ok, _request_id} = JSONRPC2.Clients.TCP.notify(__MODULE__, "subtract", [2, 1])
+      assert JSONRPC2.Clients.TCP.receive_response(request_id) == {:ok, 1}
+    end
+
+    test "notify" do
+      {:ok, _request_id} = JSONRPC2.Clients.TCP.notify(__MODULE__, "subtract", [2, 1])
+    end
   end
 end

@@ -31,13 +31,13 @@ defmodule JSONRPC2.Clients.TCP.Protocol do
       |> JSONRPC2.Request.serialized_request(state.serializer)
 
     new_state = %{state | request_counter: external_request_id_int + 1}
-    {:ok, external_request_id, [data, "\r\n"], new_state}
+    {:ok, external_request_id, data, new_state}
   end
 
   def handle_request({:notify, method, params}, state) do
     {:ok, data} = JSONRPC2.Request.serialized_request({method, params}, state.serializer)
 
-    {:ok, nil, [data, "\r\n"], state}
+    {:ok, nil, data, state}
   end
 
   def handle_data(data, state) do
@@ -69,6 +69,24 @@ defmodule JSONRPC2.Clients.TCP.Protocol do
 
   def terminate(_state) do
     :ok
+  end
+
+  parent = __MODULE__
+
+  defmodule LineTerminated do
+    @moduledoc false
+
+    defdelegate init, to: parent
+
+    defdelegate setup(socket, state), to: parent
+
+    def handle_request(request, state) do
+      {:ok, external_request_id, data, state} = unquote(parent).handle_request(request, state)
+      {:ok, external_request_id, [data, "\r\n"], state}
+    end
+
+    defdelegate handle_data(data, state), to: parent
+    defdelegate terminate(state), to: parent
   end
 
   defp external_request_id(request_counter) do

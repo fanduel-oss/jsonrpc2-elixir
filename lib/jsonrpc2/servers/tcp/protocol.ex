@@ -8,26 +8,28 @@ defmodule JSONRPC2.Servers.TCP.Protocol do
     @behaviour :ranch_protocol
   end
 
-  def start_link(ref, socket, transport, {jsonrpc2_handler, timeout}) do
-    :proc_lib.start_link(__MODULE__, :init, [{ref, socket, transport, jsonrpc2_handler, timeout}])
+  def start_link(ref, socket, transport, {jsonrpc2_handler, timeout, line_packet}) do
+    :proc_lib.start_link(__MODULE__, :init, [
+      {ref, socket, transport, jsonrpc2_handler, timeout, line_packet}
+    ])
   end
 
-  def init({ref, socket, transport, jsonrpc2_handler, timeout}) do
+  def init({ref, socket, transport, jsonrpc2_handler, timeout, line_packet}) do
     :ok = :proc_lib.init_ack({:ok, self()})
     :ok = :ranch.accept_ack(ref)
-    :ok = transport.setopts(socket, active: :once, packet: :line)
-    state = {ref, socket, transport, jsonrpc2_handler, timeout}
+    :ok = transport.setopts(socket, active: :once, packet: if(line_packet, do: :line, else: 4))
+    state = {ref, socket, transport, jsonrpc2_handler, timeout, line_packet}
     :gen_server.enter_loop(__MODULE__, [], state, timeout)
   end
 
   def handle_info({:tcp, socket, data}, state) do
-    {_ref, _socket, transport, jsonrpc2_handler, timeout} = state
+    {_ref, _socket, transport, jsonrpc2_handler, timeout, line_packet} = state
     transport.setopts(socket, active: :once)
 
     {:ok, _} =
       Task.start(fn ->
         case jsonrpc2_handler.handle(data) do
-          {:reply, reply} -> transport.send(socket, [reply, "\r\n"])
+          {:reply, reply} -> transport.send(socket, terminate_packet(reply, line_packet))
           :noreply -> :noreply
         end
       end)
@@ -56,4 +58,7 @@ defmodule JSONRPC2.Servers.TCP.Protocol do
 
     {:noreply, state}
   end
+
+  defp terminate_packet(reply, true), do: [reply, "\r\n"]
+  defp terminate_packet(reply, false), do: reply
 end

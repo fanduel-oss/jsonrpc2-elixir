@@ -12,7 +12,7 @@ defmodule JSONRPC2.Request do
 
   See the README for more information on serializers.
   """
-  @spec serialized_request(request, module) :: {:ok, map} | {:error, any}
+  @spec serialized_request(request, module) :: {:ok, String.t()} | {:error, any}
   def serialized_request(request, serializer) do
     serializer.encode(request(request))
   end
