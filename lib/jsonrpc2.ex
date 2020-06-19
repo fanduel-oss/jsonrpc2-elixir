@@ -155,7 +155,7 @@ defmodule JSONRPC2 do
           | %{optional(String.t()) => json}
 
   @typedoc "A JSON-RPC 2.0 params value."
-  @type params :: [json] | %{optional(String.t()) => json}
+  @type params :: [term] | %{optional(String.t() | atom()) => term}
 
   @typedoc "A JSON-RPC 2.0 request ID."
   @type id :: String.t() | number
