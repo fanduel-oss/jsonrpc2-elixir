@@ -1,13 +1,13 @@
 defmodule JSONRPC2.Mixfile do
   use Mix.Project
 
-  @version "1.2.0"
+  @version "2.0.0"
 
   def project do
     [
       app: :jsonrpc2,
       version: @version,
-      elixir: "~> 1.4",
+      elixir: "~> 1.8",
       deps: deps(),
       elixirc_paths: elixirc_paths(Mix.env()),
       description: description(),
