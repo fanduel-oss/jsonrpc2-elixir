@@ -121,3 +121,5 @@ end
 This section was added to verify PR scanning.
 
 Scanner check: confirming Semgrep status on this org.
+
+Follow-up check to confirm current CI configuration.
