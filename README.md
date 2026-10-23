@@ -115,3 +115,7 @@ def deps do
   [..., {:hackney, "~> 1.15"}]
 end
 ```
+
+## Notes
+
+This section was added to verify PR scanning.
