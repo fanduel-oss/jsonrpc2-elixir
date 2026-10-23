@@ -48,9 +48,10 @@ defmodule JSONRPC2.Mixfile do
       {:shackle, "~> 0.3", optional: true},
       {:ranch, "~> 1.2", optional: true},
       {:hackney, "~> 1.6", optional: true},
-      {:plug, "~> 1.3", optional: true},
+      {:plug, "1.3.5", optional: true},
       {:plug_cowboy, "~> 2.0", optional: true},
       {:cowboy, "~> 2.4 or ~> 1.1", optional: true},
+      {:sweet_xml, "0.6.5", optional: true},
       {:ex_doc, "~> 0.20", only: :dev}
     ]
   end
